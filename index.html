@@ -1,0 +1,3580 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WhatsApp Link Generator + QR Code</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #050807;
+      --card: rgba(10, 18, 15, 0.78);
+      --border: rgba(149, 255, 190, 0.18);
+      --text: #f2fff8;
+      --muted: #9fb4a8;
+      --green-light: #a7ffbf;
+      --green-mid: #36e29a;
+      --green-dark: #0aa86d;
+      --danger: #ff7373;
+      --radius-xl: 28px;
+      --radius-md: 16px;
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.36);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      cursor: default;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      overflow-x: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    input,
+    textarea {
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(167, 255, 191, 0.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(167, 255, 191, 0.055) 1px, transparent 1px);
+      background-size: 46px 46px;
+      mask-image: linear-gradient(to bottom, #000 0%, rgba(0,0,0,0.72) 42%, transparent 100%);
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      width: 920px;
+      height: 920px;
+      left: -260px;
+      top: -280px;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(54, 226, 154, 0.24), transparent 34%),
+        radial-gradient(circle at 72% 72%, rgba(10, 168, 109, 0.18), transparent 36%);
+      filter: blur(6px);
+      animation: gradientFloat 14s ease-in-out infinite alternate;
+    }
+
+    @keyframes gradientFloat {
+      0% { transform: translate3d(0, 0, 0) scale(1); }
+      35% { transform: translate3d(170px, 80px, 0) scale(1.08); }
+      70% { transform: translate3d(340px, -20px, 0) scale(0.96); }
+      100% { transform: translate3d(520px, 180px, 0) scale(1.12); }
+    }
+
+    .page-loader {
+      animation: loaderFailSafe 0.55s ease 2.4s forwards;
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(circle at 50% 20%, rgba(54, 226, 154, 0.16), transparent 34%), rgba(5, 8, 7, 0.96);
+      overflow: hidden;
+      transition: opacity 0.55s ease, visibility 0.55s ease;
+    }
+
+    .page-loader::before {
+      content: "";
+      position: absolute;
+      inset: -30%;
+      background: linear-gradient(115deg, transparent 35%, rgba(167, 255, 191, 0.12) 50%, transparent 65%);
+      animation: loaderSweep 1.8s ease-in-out infinite;
+    }
+
+    .page-loader.is-hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loader-inner {
+      position: relative;
+      z-index: 1;
+      width: min(360px, calc(100% - 42px));
+      display: grid;
+      justify-items: center;
+      gap: 16px;
+      padding: 28px;
+      border: 1px solid rgba(167, 255, 191, 0.16);
+      border-radius: 28px;
+      background: rgba(10, 18, 15, 0.72);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+      animation: loaderCardIn 0.72s ease both;
+    }
+
+    .loader-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 13px;
+    }
+
+    .loader-mark {
+      transform: scale(0.92);
+    }
+
+    .loader-name {
+      font-family: "Clash Display", sans-serif;
+      font-size: 30px;
+      font-weight: 950;
+      letter-spacing: -0.055em;
+      background: linear-gradient(120deg, #f0fff5, var(--green-light), var(--green-mid));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .loader-line {
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(167, 255, 191, 0.1);
+    }
+
+    .loader-line span {
+      display: block;
+      width: 45%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, transparent, var(--green-light), var(--green-mid));
+      animation: loaderProgress 1.1s ease-in-out infinite;
+    }
+
+    .loader-inner p {
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    @keyframes loaderSweep {
+      from { transform: translateX(-30%) translateY(-10%); }
+      to { transform: translateX(30%) translateY(10%); }
+    }
+
+    @keyframes loaderProgress {
+      0% { transform: translateX(-110%); }
+      100% { transform: translateX(235%); }
+    }
+
+    @keyframes loaderCardIn {
+      from { opacity: 0; transform: translateY(18px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes loaderFailSafe {
+      to {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+    }
+
+    .custom-cursor {
+      opacity: 0;
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 18px;
+      height: 18px;
+      z-index: 9999;
+      border: 1px solid rgba(167, 255, 191, 0.9);
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 20px rgba(54, 226, 154, 0.45);
+      transition: width 0.18s ease, height 0.18s ease, background 0.18s ease, border 0.18s ease;
+    }
+
+    .custom-cursor.is-hovering {
+      width: 34px;
+      height: 34px;
+      background: rgba(167, 255, 191, 0.12);
+      border-color: rgba(167, 255, 191, 0.55);
+    }
+
+    a,
+    button,
+    input,
+    textarea,
+    select {
+      cursor: pointer;
+    }
+
+    input,
+    textarea {
+      cursor: text;
+    }
+
+    a { color: inherit; }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 56px 0 26px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 34px;
+      align-items: start;
+    }
+
+    .hero-copy {
+      text-align: center;
+      justify-items: center;
+      position: relative;
+      min-height: clamp(430px, 58vw, 620px);
+      display: grid;
+      align-content: center;
+      padding-right: clamp(120px, 24vw, 310px);
+    }
+
+    .fade-up {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 0.8s ease forwards;
+    }
+
+    .delay-1 { animation-delay: 0.12s; }
+    .delay-2 { animation-delay: 0.22s; }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    body:not(.is-loaded) .brand-logo,
+    body:not(.is-loaded) .title-wrap,
+    body:not(.is-loaded) .subtitle,
+    body:not(.is-loaded) .use-case,
+    body:not(.is-loaded) .form-card,
+    body:not(.is-loaded) .donate-section,
+    body:not(.is-loaded) .footer {
+      opacity: 0;
+      transform: translateY(18px);
+      animation: revealIn 0.76s cubic-bezier(.2,.75,.2,1) 2.45s both;
+    }
+
+    body.is-loaded .brand-logo,
+    body.is-loaded .title-wrap,
+    body.is-loaded .subtitle,
+    body.is-loaded .use-case,
+    body.is-loaded .form-card,
+    body.is-loaded .donate-section,
+    body.is-loaded .footer {
+      animation: revealIn 0.76s cubic-bezier(.2,.75,.2,1) both;
+    }
+
+    body.is-loaded .brand-logo { animation-delay: 0.06s; }
+    body.is-loaded .title-wrap { animation-delay: 0.16s; }
+    body.is-loaded .subtitle {
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
+      position: relative;
+      z-index: 2; animation-delay: 0.28s; }
+    body.is-loaded .use-case:nth-child(1) { animation-delay: 0.38s; }
+    body.is-loaded .use-case:nth-child(2) { animation-delay: 0.46s; }
+    body.is-loaded .use-case:nth-child(3) { animation-delay: 0.54s; }
+    body.is-loaded .use-case:nth-child(4) { animation-delay: 0.62s; }
+    body.is-loaded .form-card { animation-delay: 0.72s; }
+    body.is-loaded .donate-section { animation-delay: 0.82s; }
+    body.is-loaded .footer { animation-delay: 0.9s; }
+
+    body:not(.is-loaded) .robot-3d {
+      opacity: 0;
+      transform: translateY(18px) scale(0.92);
+      animation:
+        robotIntro 0.86s cubic-bezier(.2,.75,.2,1) 2.55s both,
+        robotFloat 5.8s ease-in-out 3.4s infinite,
+        robotDrift 9s ease-in-out 3.4s infinite;
+    }
+
+    body.is-loaded .robot-3d {
+      animation:
+        robotIntro 0.86s cubic-bezier(.2,.75,.2,1) 0.28s both,
+        robotFloat 5.8s ease-in-out 1.18s infinite,
+        robotDrift 9s ease-in-out 1.18s infinite;
+    }
+
+    @media (min-width: 901px) {
+      .title-wrap {
+        min-height: clamp(170px, 18vw, 250px);
+        display: flex;
+        align-items: center;
+      }
+    }
+
+    @keyframes revealIn {
+      from {
+        opacity: 0;
+        transform: translateY(18px) scale(0.985);
+        filter: blur(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+    }
+
+    @keyframes robotIntro {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.9) rotate(-8deg);
+        filter: blur(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1) rotate(0deg);
+        filter: blur(0);
+      }
+    }
+
+    .brand-logo {
+      margin-left: auto;
+      margin-right: auto;
+      transform: translateY(-2px);
+      display: inline-flex;
+      align-items: center;
+      gap: 13px;
+      width: fit-content;
+      padding: 12px 18px 12px 12px;
+      margin-bottom: 24px;
+      border: 1px solid rgba(167, 255, 191, 0.2);
+      border-radius: 999px;
+      background: rgba(167, 255, 191, 0.065);
+      color: #ddffe8;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 12px 32px rgba(54, 226, 154, 0.08);
+    }
+
+    .brand-mark {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 16px;
+      background:
+        radial-gradient(circle at 28% 25%, rgba(255,255,255,0.85), transparent 32%),
+        linear-gradient(145deg, #d7ffe2 0%, var(--green-light) 36%, var(--green-mid) 72%, var(--green-dark) 100%);
+      box-shadow:
+        inset 0 1px 1px rgba(255,255,255,0.7),
+        inset -8px -10px 18px rgba(0, 79, 47, 0.22),
+        0 10px 28px rgba(54, 226, 154, 0.26);
+      overflow: visible;
+    }
+
+    .brand-mark::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 10px;
+      width: 26px;
+      height: 22px;
+      transform: translateX(-50%);
+      border-radius: 9px 9px 8px 8px;
+      background: rgba(5, 33, 20, 0.88);
+      box-shadow: inset 0 0 0 1px rgba(167, 255, 191, 0.18);
+    }
+
+    .brand-mark::after {
+      content: "";
+      position: absolute;
+      left: 12px;
+      top: 18px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--green-light);
+      box-shadow:
+        4px 0 0 var(--green-light),
+        0 0 10px rgba(167, 255, 191, 0.95),
+        13px 0 10px rgba(167, 255, 191, 0.95);
+      z-index: 2;
+      animation: robotLogoBlink 4.6s ease-in-out infinite;
+    }
+
+    .brand-antenna {
+      position: absolute;
+      left: 50%;
+      top: -6px;
+      width: 3px;
+      height: 11px;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: var(--green-light);
+      box-shadow: 0 0 12px rgba(167, 255, 191, 0.9);
+    }
+
+    .brand-antenna::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: -5px;
+      width: 8px;
+      height: 8px;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: #eafff2;
+    }
+
+    .brand-mouth {
+      position: absolute;
+      left: 50%;
+      top: 28px;
+      width: 13px;
+      height: 6px;
+      transform: translateX(-50%);
+      border-bottom: 2px solid rgba(167, 255, 191, 0.78);
+      border-radius: 0 0 999px 999px;
+      background: transparent;
+      z-index: 2;
+    }
+
+    @keyframes robotLogoBlink {
+      0%, 88%, 100% { transform: scaleY(1); }
+      92%, 95% { transform: scaleY(0.18); }
+    }
+
+    .brand-name {
+      font-family: "Clash Display", sans-serif;
+      font-size: 28px;
+      font-weight: 950;
+      letter-spacing: -0.055em;
+      background: linear-gradient(120deg, #f0fff5, var(--green-light), var(--green-mid));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .title-wrap {
+      margin-left: auto;
+      margin-right: auto;
+      position: relative;
+      width: min(100%, 980px);
+      max-width: 980px;
+    }
+
+    .title {
+      min-height: 1.95em;
+      font-family: "Clash Display", sans-serif;
+      font-weight: 700;
+      max-width: min(860px, calc(100vw - 360px));
+      font-size: clamp(42px, 6.1vw, 86px);
+      line-height: 0.94;
+      letter-spacing: -0.075em;
+      margin-bottom: 22px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .gradient-text {
+      background: linear-gradient(120deg, var(--green-light), var(--green-mid), #e7ffec);
+      background-size: 220% 220%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: textGradientMove 5s ease-in-out infinite alternate;
+    }
+
+    .title-static {
+      display: inline;
+    }
+
+    .typing-stage {
+      display: inline-flex;
+      align-items: baseline;
+      width: 8.4em;
+      min-width: 8.4em;
+      white-space: nowrap;
+      vertical-align: baseline;
+      overflow: visible;
+    }
+
+    .typing-word {
+      display: inline-block;
+      min-width: auto;
+      background: linear-gradient(120deg, var(--green-light), var(--green-mid), #e7ffec);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      white-space: nowrap;
+    }
+
+    .typing-cursor {
+      display: inline-block;
+      margin-left: 4px;
+      color: var(--green-light);
+      animation: cursorBlink 0.78s steps(2, start) infinite;
+    }
+
+    @keyframes cursorBlink {
+      0%, 42% { opacity: 1; }
+      43%, 100% { opacity: 0; }
+    }
+
+    @keyframes textGradientMove {
+      from { background-position: 0% 50%; }
+      to { background-position: 100% 50%; }
+    }
+
+    .robot-3d {
+      transform-origin: center;
+      will-change: transform, opacity;
+      position: absolute;
+      right: clamp(-250px, -21vw, -145px);
+      top: 50%;
+      width: clamp(150px, 17vw, 230px);
+      height: clamp(150px, 17vw, 230px);
+      margin-top: calc(clamp(150px, 17vw, 230px) / -2);
+      z-index: 3;
+      perspective: 900px;
+      pointer-events: none;
+      animation: robotFloat 4.8s ease-in-out infinite;
+    }
+
+    .robot-body {$1transform: rotateX(10deg) rotateY(-16deg);
+      animation: robotBodyBreath 6.5s ease-in-out infinite;
+    }
+
+    @keyframes robotBodyBreath {
+      0%, 100% { transform: rotateX(10deg) rotateY(-16deg) scale(1); }
+      50% { transform: rotateX(12deg) rotateY(-10deg) scale(1.025); }
+    }
+
+    .robot-body::before,
+    .robot-body::after {
+      content: "";
+      position: absolute;
+      top: 36%;
+      width: 16%;
+      height: 15%;
+      border-radius: 50%;
+      background: #06120b;
+      box-shadow: 0 0 12px rgba(255,255,255,0.65);
+    }
+
+    .robot-body::before { left: 25%; }
+    .robot-body::after { right: 25%; }
+
+    .robot-antenna {
+      position: absolute;
+      left: 48%;
+      top: 7%;
+      width: 3%;
+      height: 18%;
+      border-radius: 999px;
+      background: var(--green-light);
+      box-shadow: 0 0 14px rgba(167, 255, 191, 0.9);
+    }
+
+    .robot-antenna::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: -34%;
+      width: 320%;
+      height: 46%;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: #dfffee;
+      box-shadow: 0 0 18px rgba(167, 255, 191, 0.9);
+    }
+
+    .robot-arm {$1box-shadow: inset -5px -4px 8px rgba(0,0,0,0.18);
+      animation: robotArmWave 4.8s ease-in-out infinite;
+      transform-origin: right center;
+    }
+
+    @keyframes robotArmWave {
+      0%, 100% { transform: rotate(18deg); }
+      50% { transform: rotate(28deg) translateY(-2px); }
+    }
+
+    .robot-message {$1box-shadow: 0 18px 34px rgba(0,0,0,0.24);
+      animation: messageFloat 5.2s ease-in-out infinite;
+    }
+
+    @keyframes messageFloat {
+      0%, 100% { transform: rotate(-10deg) rotateY(-18deg) translateY(0); }
+      50% { transform: rotate(-7deg) rotateY(-14deg) translateY(-8px); }
+    }
+
+    .robot-message::before,
+    .robot-message::after {
+      content: "";
+      position: absolute;
+      left: 20%;
+      right: 20%;
+      height: 8%;
+      border-radius: 999px;
+      background: rgba(6, 18, 11, 0.32);
+    }
+
+    .robot-message::before { top: 31%; }
+    .robot-message::after { top: 56%; }
+
+    .robot-shadow {
+      position: absolute;
+      left: 25%;
+      bottom: 4%;
+      width: 57%;
+      height: 12%;
+      border-radius: 50%;
+      background: rgba(54, 226, 154, 0.18);
+      filter: blur(8px);
+      animation: shadowPulse 4.8s ease-in-out infinite;
+    }
+
+    @keyframes robotFloat {
+      0%, 100% { transform: translate3d(0, 0, 0) rotate(-2deg); }
+      35% { transform: translate3d(6px, -10px, 0) rotate(2deg); }
+      70% { transform: translate3d(-5px, -16px, 0) rotate(4deg); }
+    }
+
+    @keyframes robotDrift {
+      0%, 100% { filter: drop-shadow(0 18px 28px rgba(54, 226, 154, 0.1)); }
+      50% { filter: drop-shadow(0 28px 44px rgba(54, 226, 154, 0.22)); }
+    }
+
+    @keyframes shadowPulse {
+      0%, 100% { transform: scale(1); opacity: 0.55; }
+      50% { transform: scale(0.82); opacity: 0.32; }
+    }
+
+    .subtitle {
+        max-width: 100%;
+        font-size: 15px;
+        line-height: 1.9;
+      font-weight: 500;
+      letter-spacing: -0.015em;
+      max-width: 760px;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.75;
+      margin-bottom: 26px;
+    }
+
+    .use-cases {
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      max-width: 860px;
+    }
+
+    .use-case {
+        width: 100%;
+        font-size: 14px;
+      backdrop-filter: blur(10px);
+      padding: 15px 16px;
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 20px;
+      background: rgba(255,255,255,0.035);
+      color: #e2fff0;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .use-case strong {
+      font-family: "Clash Display", sans-serif;
+      display: block;
+      margin-bottom: 6px;
+      color: var(--green-light);
+      font-size: 14px;
+      letter-spacing: -0.01em;
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      background: linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.018)), var(--card);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .form-card {
+      width: min(760px, 100%);
+      margin: 0 auto;
+      padding: 28px;
+    }
+
+    .card-kicker {
+      text-align: center;
+      color: var(--green-light);
+      font-size: 12px;
+      font-weight: 750;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      margin-bottom: 7px;
+    }
+
+    .card-title {
+      text-align: center;
+      font-family: "Clash Display", sans-serif;
+      font-size: 26px;
+      letter-spacing: -0.04em;
+      margin-bottom: 22px;
+    }
+
+    .form-grid { display: grid; gap: 16px; }
+    .field { display: grid; gap: 8px; text-align: left; }
+
+    .field-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .message-toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      color: var(--green-light);
+      background: rgba(167, 255, 191, 0.075);
+      border: 1px solid rgba(167, 255, 191, 0.18);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .message-toggle-btn.is-off {
+      color: var(--muted);
+      background: rgba(255,255,255,0.045);
+      border-color: rgba(255,255,255,0.1);
+    }
+
+    .message-disabled-note {
+      display: none;
+      color: var(--green-light);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .message-disabled-note.is-visible {
+      display: block;
+    }
+
+    .ai-agent-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      color: #03120b;
+      background: linear-gradient(120deg, var(--green-light), var(--green-mid));
+      font-size: 12px;
+      font-weight: 900;
+      box-shadow: 0 12px 28px rgba(54, 226, 154, 0.18);
+    }
+
+    .ai-agent-panel {
+      display: none;
+      margin-top: 4px;
+      padding: 14px;
+      border: 1px solid rgba(167, 255, 191, 0.16);
+      border-radius: 18px;
+      background: rgba(167, 255, 191, 0.055);
+      animation: popIn 0.24s ease both;
+    }
+
+    .ai-agent-panel.is-visible {
+      display: grid;
+      gap: 12px;
+    }
+
+    .ai-agent-title {
+      color: var(--green-light);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .ai-agent-result {
+      width: 100%;
+      min-height: 92px;
+      padding: 12px;
+      border: 1px solid rgba(167, 255, 191, 0.16);
+      border-radius: 14px;
+      background: rgba(0,0,0,0.22);
+      color: #eafff2;
+      font-size: 13px;
+      line-height: 1.65;
+      user-select: text;
+      -webkit-user-select: text;
+      white-space: pre-wrap;
+    }
+
+    .ai-agent-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .ai-agent-actions button {
+      padding: 10px 13px;
+      font-size: 12px;
+    }
+
+    label {
+      font-family: "Plus Jakarta Sans", sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: #effff5;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid rgba(167, 255, 191, 0.17);
+      border-radius: var(--radius-md);
+      outline: none;
+      background: rgba(0,0,0,0.24);
+      color: var(--text);
+      padding: 14px 15px;
+      font: inherit;
+      transition: 0.22s ease;
+    }
+
+    textarea {
+      min-height: 128px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: rgba(167, 255, 191, 0.7);
+      box-shadow: 0 0 0 4px rgba(54, 226, 154, 0.12);
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    button {
+      font-family: "Plus Jakarta Sans", sans-serif;
+      border: 0;
+      cursor: pointer;
+      border-radius: 999px;
+      padding: 13px 18px;
+      font: inherit;
+      font-weight: 800;
+      transition: 0.22s ease;
+    }
+
+    button:hover { transform: translateY(-2px); }
+
+    .btn-primary {
+      color: #03120b;
+      background: linear-gradient(120deg, var(--green-light), var(--green-mid));
+      box-shadow: 0 16px 42px rgba(54, 226, 154, 0.22);
+    }
+
+    .btn-secondary {
+      color: var(--text);
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .status {
+      min-height: 20px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .status.error { color: var(--danger); }
+    .status.success { color: var(--green-light); }
+
+    .result-card {
+      display: none;
+      margin-top: 30px;
+      padding: 24px;
+    }
+
+    .result-card.is-visible { display: block; }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .output-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .output-box {
+      padding: 15px;
+      border: 1px solid rgba(167, 255, 191, 0.13);
+      border-radius: 18px;
+      background: rgba(0,0,0,0.22);
+    }
+
+    .output-box.is-hidden { display: none; }
+
+    .output-head {
+      text-align: left;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+      color: var(--green-light);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .copy-btn,
+    .open-btn {
+      padding: 0;
+      background: transparent;
+      color: var(--green-light);
+      font-size: 12px;
+      border-radius: 0;
+    }
+
+    .copy-btn:hover,
+    .open-btn:hover {
+      transform: none;
+      opacity: 0.75;
+    }
+
+    .output-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .output-link {
+      text-align: left;
+      display: block;
+      color: #eafff2;
+      word-break: break-all;
+      font-size: 14px;
+      line-height: 1.65;
+      text-decoration: underline;
+      text-decoration-color: rgba(167, 255, 191, 0.35);
+      text-underline-offset: 4px;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    .manual-copy {
+      position: fixed;
+      inset: 0;
+      z-index: 9998;
+      display: none;
+      place-items: center;
+      padding: 18px;
+      background: rgba(0, 0, 0, 0.58);
+      backdrop-filter: blur(10px);
+    }
+
+    .manual-copy.is-visible {
+      display: grid;
+      animation: fadeIn 0.2s ease both;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .manual-copy-card {
+      width: min(560px, 100%);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background: #08120e;
+      box-shadow: var(--shadow);
+      padding: 20px;
+      color: var(--text);
+      animation: popIn 0.25s ease both;
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.94) translateY(12px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .manual-copy-card h3 {
+      font-size: 20px;
+      margin-bottom: 10px;
+      letter-spacing: -0.02em;
+    }
+
+    .manual-copy-card p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .manual-copy-card textarea {
+      min-height: 92px;
+      margin-bottom: 14px;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    .qr-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .qr-wrap {
+      display: grid;
+      justify-items: center;
+      gap: 14px;
+      padding: 18px;
+      border-radius: 22px;
+      background: #ecfff1;
+      color: #06120b;
+    }
+
+    .qr-wrap.is-hidden { display: none; }
+
+    .qr-title {
+      color: #06120b;
+      font-size: 14px;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .qr-code {
+      width: 210px;
+      min-height: 210px;
+      display: grid;
+      place-items: center;
+    }
+
+    .qr-caption {
+      color: #234331;
+      text-align: center;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .note {
+      text-align: center;
+      margin-top: 18px;
+      padding: 14px 15px;
+      border-radius: 18px;
+      background: rgba(167,255,191,0.07);
+      border: 1px solid rgba(167,255,191,0.13);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .donate-section {
+      margin-top: 26px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .donate-link {
+      position: relative;
+      z-index: 20;
+      pointer-events: auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 18px;
+      border-radius: 999px;
+      color: #03120b;
+      font-weight: 900;
+      text-decoration: none;
+      background: linear-gradient(120deg, var(--green-light), var(--green-mid));
+      box-shadow: 0 16px 42px rgba(54, 226, 154, 0.18);
+    }
+
+    .footer {
+      position: relative;
+      z-index: 1;
+      padding: 30px 0 6px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .footer a {
+      position: relative;
+      z-index: 20;
+      pointer-events: auto;
+      color: var(--green-light);
+      text-decoration: none;
+      font-weight: 800;
+    }
+
+    @media (max-width: 1060px) {
+      .hero-copy {
+        min-height: clamp(390px, 58vw, 540px);
+        padding-right: clamp(110px, 24vw, 230px);
+      }
+
+      .title {
+        max-width: min(720px, calc(100vw - 280px));
+      }
+
+      .robot-3d {
+        right: clamp(-180px, -18vw, -95px);
+        width: clamp(130px, 18vw, 180px);
+        height: clamp(130px, 18vw, 180px);
+        margin-top: calc(clamp(130px, 18vw, 180px) / -2);
+      }
+    }
+
+    @media (max-width: 900px) {
+      .hero-copy {
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .title-wrap,
+      .subtitle,
+      .use-cases {
+        max-width: 100%;
+      }
+      html,
+      body,
+      a,
+      button,
+      input,
+      textarea,
+      select {
+        cursor: auto;
+      }
+
+      .custom-cursor { display: none; }
+
+      .hero,
+      .qr-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-copy {
+        min-height: auto;
+        padding-right: clamp(96px, 30vw, 140px);
+        align-content: start;
+      }
+
+      .page { padding: 34px 0 20px; }
+
+      .title {
+        max-width: 100%;
+        width: 100%;
+        font-size: clamp(40px, 11vw, 58px);
+        letter-spacing: -0.055em;
+      }
+
+      .robot-3d {
+        position: absolute;
+        right: 4px;
+        top: 42%;
+        width: clamp(96px, 26vw, 132px);
+        height: clamp(96px, 26vw, 132px);
+        margin-top: calc(clamp(96px, 26vw, 132px) / -2);
+        transform: none;
+      }
+
+      .title-wrap {
+        display: block;
+        width: 100%;
+      }
+
+      .brand-logo {
+        padding: 10px 14px 10px 11px;
+        margin-bottom: 18px;
+      }
+
+      .brand-mark {
+        width: 38px;
+        height: 38px;
+        border-radius: 14px;
+      }
+
+      .brand-name {
+        font-size: 20px;
+      }
+
+      .use-cases {
+        grid-template-columns: 1fr;
+      }
+
+      .title {
+        min-height: 3.15em;
+        margin-bottom: 18px;
+      }
+
+      .title-static {
+        display: block;
+      }
+
+      .typing-stage {
+        display: inline-flex;
+        width: 8.4em;
+        min-width: 8.4em;
+      }
+    }
+  
+
+    /* ===== Responsive & Typing Stability Patch ===== */
+    .title {
+      text-align: center;
+      min-height: 2.05em;
+    }
+
+    .typing-stage {
+      display: inline-flex;
+      justify-content: flex-start;
+      align-items: baseline;
+      width: 8.8em;
+      min-width: 8.8em;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 900px) {
+      .page {
+        width: min(100% - 28px, 560px);
+        padding-top: 38px;
+      }
+
+      .hero {
+        gap: 28px;
+      }
+
+      .hero-copy {
+        padding-right: 0 !important;
+        min-height: auto !important;
+        text-align: center;
+        justify-items: center;
+      }
+
+      .brand-logo {
+        margin-inline: auto;
+        transform: none;
+      }
+
+      .title-wrap {
+        width: 100%;
+        max-width: 100%;
+        min-height: auto !important;
+        display: grid !important;
+        justify-items: center;
+      }
+
+      .title {
+        width: 100%;
+        max-width: 100% !important;
+        min-height: 2.65em !important;
+        margin-bottom: 14px;
+        font-size: clamp(38px, 11.5vw, 56px) !important;
+        line-height: 0.98;
+        letter-spacing: -0.055em;
+        text-align: center;
+      }
+
+      .title-static {
+        display: block;
+      }
+
+      .typing-stage {
+        width: 100%;
+        min-width: 100%;
+        justify-content: center;
+      }
+
+      .robot-3d {
+        position: relative !important;
+        right: auto !important;
+        top: auto !important;
+        width: clamp(104px, 28vw, 136px) !important;
+        height: clamp(104px, 28vw, 136px) !important;
+        margin: 4px auto 10px !important;
+        transform: none !important;
+      }
+
+      .subtitle {
+        max-width: 100%;
+        margin-inline: auto;
+        font-size: 15px;
+        line-height: 1.75;
+        text-align: center;
+      }
+
+      .use-cases {
+        grid-template-columns: 1fr;
+        width: 100%;
+        max-width: 100%;
+        text-align: center;
+      }
+
+      .use-case {
+        width: 100%;
+        padding: 16px;
+        font-size: 13px;
+      }
+
+      .form-card,
+      .result-card {
+        width: 100%;
+        padding: 22px;
+        border-radius: 24px;
+      }
+
+      .field-head {
+        align-items: center;
+      }
+
+      .ai-agent-btn {
+        white-space: nowrap;
+        padding: 7px 10px;
+        font-size: 11px;
+      }
+
+      .btn-row {
+        justify-content: center;
+      }
+
+      .btn-row button {
+        flex: 1 1 auto;
+      }
+
+      .donate-section,
+      .footer {
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .page {
+        width: calc(100% - 22px);
+      }
+
+      .title {
+        font-size: clamp(35px, 11vw, 48px) !important;
+      }
+
+      .brand-name {
+        font-size: 22px;
+      }
+
+      .brand-mark {
+        width: 36px;
+        height: 36px;
+      }
+    }
+  
+
+    /* ===== Robot Mascot Fix Patch ===== */
+    .robot-3d {
+      display: block !important;
+      overflow: visible !important;
+      isolation: isolate;
+    }
+
+    .robot-shadow,
+    .robot-antenna,
+    .robot-arm,
+    .robot-message,
+    .robot-body {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1;
+    }
+
+    .robot-shadow {
+      position: absolute !important;
+      left: 25% !important;
+      bottom: 3% !important;
+      width: 58% !important;
+      height: 13% !important;
+      border-radius: 50% !important;
+      background: rgba(54, 226, 154, 0.18) !important;
+      filter: blur(8px) !important;
+      z-index: 0 !important;
+    }
+
+    .robot-body {
+      position: absolute !important;
+      left: 24% !important;
+      top: 22% !important;
+      width: 50% !important;
+      height: 54% !important;
+      border-radius: 28px 28px 22px 22px !important;
+      background: linear-gradient(145deg, #eafff2 0%, #a7ffbf 44%, #17b979 100%) !important;
+      box-shadow:
+        inset -10px -12px 22px rgba(0, 79, 47, 0.3),
+        inset 8px 10px 18px rgba(255,255,255,0.72),
+        0 24px 44px rgba(54, 226, 154, 0.28) !important;
+      transform: rotateX(10deg) rotateY(-16deg) !important;
+      transform-origin: center !important;
+      z-index: 3 !important;
+      animation: robotBodyBreathSafe 6.5s ease-in-out infinite !important;
+    }
+
+    .robot-body::before,
+    .robot-body::after {
+      content: "" !important;
+      position: absolute !important;
+      top: 36% !important;
+      width: 16% !important;
+      height: 15% !important;
+      border-radius: 50% !important;
+      background: #06120b !important;
+      box-shadow: 0 0 12px rgba(255,255,255,0.65) !important;
+    }
+
+    .robot-body::before { left: 25% !important; }
+    .robot-body::after { right: 25% !important; }
+
+    .robot-antenna {
+      position: absolute !important;
+      left: 48% !important;
+      top: 7% !important;
+      width: 3% !important;
+      height: 18% !important;
+      border-radius: 999px !important;
+      background: var(--green-light) !important;
+      box-shadow: 0 0 14px rgba(167, 255, 191, 0.9) !important;
+      z-index: 4 !important;
+    }
+
+    .robot-antenna::before {
+      content: "" !important;
+      position: absolute !important;
+      left: 50% !important;
+      top: -34% !important;
+      width: 320% !important;
+      height: 46% !important;
+      transform: translateX(-50%) !important;
+      border-radius: 50% !important;
+      background: #dfffee !important;
+      box-shadow: 0 0 18px rgba(167, 255, 191, 0.9) !important;
+    }
+
+    .robot-arm {
+      position: absolute !important;
+      left: 12% !important;
+      top: 46% !important;
+      width: 28% !important;
+      height: 10% !important;
+      border-radius: 999px !important;
+      background: linear-gradient(120deg, #a7ffbf, #0aa86d) !important;
+      box-shadow: inset -5px -4px 8px rgba(0,0,0,0.18) !important;
+      transform-origin: right center !important;
+      z-index: 2 !important;
+      animation: robotArmWaveSafe 4.8s ease-in-out infinite !important;
+    }
+
+    .robot-message {
+      position: absolute !important;
+      right: 0 !important;
+      bottom: 12% !important;
+      width: 45% !important;
+      height: 32% !important;
+      border-radius: 15px !important;
+      background: linear-gradient(145deg, #f1fff6, #a7ffbf) !important;
+      box-shadow: 0 18px 34px rgba(0,0,0,0.24) !important;
+      z-index: 5 !important;
+      animation: messageFloatSafe 5.2s ease-in-out infinite !important;
+    }
+
+    .robot-message::before,
+    .robot-message::after {
+      content: "" !important;
+      position: absolute !important;
+      left: 20% !important;
+      right: 20% !important;
+      height: 8% !important;
+      border-radius: 999px !important;
+      background: rgba(6, 18, 11, 0.32) !important;
+    }
+
+    .robot-message::before { top: 31% !important; }
+    .robot-message::after { top: 56% !important; }
+
+    @keyframes robotBodyBreathSafe {
+      0%, 100% { transform: rotateX(10deg) rotateY(-16deg) scale(1); }
+      50% { transform: rotateX(12deg) rotateY(-10deg) scale(1.025); }
+    }
+
+    @keyframes robotArmWaveSafe {
+      0%, 100% { transform: rotate(18deg); }
+      50% { transform: rotate(28deg) translateY(-2px); }
+    }
+
+    @keyframes messageFloatSafe {
+      0%, 100% { transform: rotate(-10deg) rotateY(-18deg) translateY(0); }
+      50% { transform: rotate(-7deg) rotateY(-14deg) translateY(-8px); }
+    }
+  
+
+    /* ===== Final Alignment, Logo & Robustness Patch ===== */
+    .brand-mouth {
+      display: none !important;
+    }
+
+    .brand-mark::before {
+      height: 23px !important;
+      top: 10px !important;
+    }
+
+    .brand-mark::after {
+      top: 19px !important;
+    }
+
+    @media (min-width: 901px) {
+      .page {
+        width: min(1180px, calc(100% - 48px));
+      }
+
+      .hero-copy {
+        padding-right: 0 !important;
+        text-align: center;
+        justify-items: center;
+        min-height: auto !important;
+        padding-top: 36px;
+      }
+
+      .brand-logo,
+      .title-wrap,
+      .subtitle,
+      .use-cases {
+        margin-left: auto !important;
+        margin-right: auto !important;
+      }
+
+      .title-wrap {
+        width: min(100%, 900px) !important;
+        min-height: 230px !important;
+        display: grid !important;
+        justify-items: center;
+        align-items: center;
+      }
+
+      .title {
+        max-width: 900px !important;
+        width: 100%;
+        text-align: center;
+        min-height: 1.95em !important;
+      }
+
+      .typing-stage {
+        justify-content: center;
+      }
+
+      .robot-3d {
+        right: clamp(-32px, 4vw, 70px) !important;
+        top: 50% !important;
+      }
+
+      .subtitle {
+        text-align: center;
+      }
+
+      .use-cases {
+        text-align: center;
+      }
+
+      .form-card,
+      .result-card {
+        margin-left: auto !important;
+        margin-right: auto !important;
+      }
+    }
+  
+
+    /* ===== WinkBox Robot Consistency Patch ===== */
+    .brand-antenna,
+    .brand-antenna::before,
+    .brand-mouth {
+      display: none !important;
+    }
+
+    .brand-mark::before {
+      left: 50% !important;
+      top: 10px !important;
+      width: 26px !important;
+      height: 23px !important;
+      transform: translateX(-50%) !important;
+    }
+
+    .brand-mark::after {
+      left: 50% !important;
+      top: 18px !important;
+      width: 5px !important;
+      height: 5px !important;
+      transform: translateX(-8px) !important;
+      box-shadow:
+        13px 0 0 var(--green-light),
+        0 0 10px rgba(167, 255, 191, 0.95),
+        16px 0 10px rgba(167, 255, 191, 0.95) !important;
+    }
+
+    .robot-antenna,
+    .robot-antenna::before {
+      display: none !important;
+    }
+
+    .robot-body {
+      left: 23% !important;
+      top: 20% !important;
+      width: 54% !important;
+      height: 58% !important;
+      border-radius: 28% 28% 24% 24% !important;
+      background:
+        radial-gradient(circle at 30% 22%, rgba(255,255,255,0.85), transparent 32%),
+        linear-gradient(145deg, #d7ffe2 0%, var(--green-light) 36%, var(--green-mid) 72%, var(--green-dark) 100%) !important;
+    }
+
+    .robot-body::after {
+      content: "" !important;
+      position: absolute !important;
+      left: 50% !important;
+      top: 31% !important;
+      width: 50% !important;
+      height: 30% !important;
+      transform: translateX(-50%) !important;
+      border-radius: 12px 12px 10px 10px !important;
+      background: rgba(5, 33, 20, 0.88) !important;
+      box-shadow: inset 0 0 0 1px rgba(167, 255, 191, 0.18) !important;
+      z-index: 1 !important;
+    }
+
+    .robot-body::before {
+      content: "" !important;
+      position: absolute !important;
+      left: 50% !important;
+      top: 42% !important;
+      width: 6% !important;
+      height: 6% !important;
+      transform: translateX(-11px) !important;
+      border-radius: 50% !important;
+      background: var(--green-light) !important;
+      box-shadow:
+        22px 0 0 var(--green-light),
+        0 0 12px rgba(167,255,191,0.95),
+        22px 0 12px rgba(167,255,191,0.95) !important;
+      z-index: 2 !important;
+    }
+
+    .robot-message {
+      right: -2% !important;
+      bottom: 12% !important;
+      width: 42% !important;
+      height: 42% !important;
+      border-radius: 50% !important;
+      background: linear-gradient(145deg, #eafff2 0%, #a7ffbf 38%, #36e29a 74%, #0aa86d 100%) !important;
+      box-shadow:
+        inset 7px 8px 14px rgba(255,255,255,0.48),
+        inset -8px -10px 16px rgba(0,79,47,0.24),
+        0 18px 34px rgba(0,0,0,0.24) !important;
+    }
+
+    .robot-message::before {
+      content: "" !important;
+      position: absolute !important;
+      left: 50% !important;
+      top: 50% !important;
+      width: 42% !important;
+      height: 42% !important;
+      transform: translate(-50%, -50%) rotate(-18deg) !important;
+      border: 5px solid #06120b !important;
+      border-top-color: transparent !important;
+      border-radius: 50% !important;
+      background: transparent !important;
+      z-index: 2 !important;
+    }
+
+    .robot-message::after {
+      content: "" !important;
+      position: absolute !important;
+      right: 10% !important;
+      bottom: 5% !important;
+      width: 22% !important;
+      height: 22% !important;
+      border-radius: 3px 3px 12px 3px !important;
+      background: #36e29a !important;
+      transform: rotate(28deg) !important;
+      z-index: 1 !important;
+    }
+  
+
+    /* ===== Final WinkBox Logo + Mascot Code Patch ===== */
+    .brand-mark {
+      border-radius: 14px !important;
+    }
+
+    .brand-mark::before {
+      content: "" !important;
+      position: absolute !important;
+      left: 50% !important;
+      top: 10px !important;
+      width: 26px !important;
+      height: 22px !important;
+      transform: translateX(-50%) !important;
+      border-radius: 10px !important;
+      background: rgba(5, 33, 20, 0.92) !important;
+      box-shadow:
+        inset 0 0 0 1px rgba(167, 255, 191, 0.18),
+        inset 0 5px 10px rgba(167, 255, 191, 0.08) !important;
+      z-index: 1 !important;
+    }
+
+    .brand-mark::after {
+      content: "" !important;
+      position: absolute !important;
+      left: 15px !important;
+      top: 18px !important;
+      width: 5px !important;
+      height: 5px !important;
+      border-radius: 50% !important;
+      background: var(--green-light) !important;
+      box-shadow: 0 0 10px rgba(167, 255, 191, 0.95) !important;
+      transform: none !important;
+      z-index: 3 !important;
+      animation: leftEyeBlink 5.6s ease-in-out infinite !important;
+    }
+
+    .brand-logo .brand-mark .brand-eye-wink,
+    .loader-logo .brand-mark .brand-eye-wink {
+      display: block !important;
+      position: absolute !important;
+      left: 24px !important;
+      top: 18px !important;
+      width: 8px !important;
+      height: 5px !important;
+      border-bottom: 3px solid var(--green-light) !important;
+      border-radius: 0 0 999px 999px !important;
+      box-shadow: 0 4px 10px rgba(167, 255, 191, 0.75) !important;
+      z-index: 3 !important;
+      animation: winkEyeBlink 5.6s ease-in-out infinite !important;
+    }
+
+    @keyframes leftEyeBlink {
+      0%, 86%, 100% { transform: scaleY(1); }
+      90%, 93% { transform: scaleY(0.16); }
+    }
+
+    @keyframes winkEyeBlink {
+      0%, 82%, 100% { transform: translateY(0) scaleY(1); opacity: 1; }
+      88%, 94% { transform: translateY(1px) scaleY(0.72); opacity: 0.9; }
+    }
+
+    .robot-body {
+      left: 22% !important;
+      top: 18% !important;
+      width: 56% !important;
+      height: 60% !important;
+      border-radius: 26% !important;
+      background:
+        radial-gradient(circle at 28% 20%, rgba(255,255,255,0.86), transparent 32%),
+        linear-gradient(145deg, #ddffe8 0%, #9ff6bd 36%, #36e29a 72%, #0aa86d 100%) !important;
+      transform: rotateX(8deg) rotateY(-12deg) !important;
+    }
+
+    .robot-body::after {
+      content: "" !important;
+      position: absolute !important;
+      left: 50% !important;
+      top: 31% !important;
+      width: 54% !important;
+      height: 30% !important;
+      transform: translateX(-50%) !important;
+      border-radius: 14px !important;
+      background: rgba(5, 33, 20, 0.94) !important;
+      box-shadow:
+        inset 0 0 0 1px rgba(167, 255, 191, 0.18),
+        inset 0 8px 12px rgba(167, 255, 191, 0.07) !important;
+      z-index: 1 !important;
+    }
+
+    .robot-body::before {
+      content: "" !important;
+      position: absolute !important;
+      left: 41% !important;
+      top: 42% !important;
+      width: 7% !important;
+      height: 7% !important;
+      border-radius: 50% !important;
+      background: var(--green-light) !important;
+      box-shadow: 0 0 12px rgba(167,255,191,0.95) !important;
+      z-index: 3 !important;
+      animation: mascotLeftBlink 5.2s ease-in-out infinite !important;
+    }
+
+    .robot-body .mascot-wink-eye {
+      display: block !important;
+      position: absolute !important;
+      left: 55% !important;
+      top: 42% !important;
+      width: 12% !important;
+      height: 7% !important;
+      border-bottom: 5px solid var(--green-light) !important;
+      border-radius: 0 0 999px 999px !important;
+      z-index: 3 !important;
+      box-shadow: 0 6px 14px rgba(167,255,191,0.75) !important;
+      animation: mascotWinkPulse 5.2s ease-in-out infinite !important;
+    }
+
+    @keyframes mascotLeftBlink {
+      0%, 84%, 100% { transform: scaleY(1); }
+      88%, 92% { transform: scaleY(0.14); }
+    }
+
+    @keyframes mascotWinkPulse {
+      0%, 80%, 100% { transform: translateY(0) scaleY(1); }
+      87%, 94% { transform: translateY(2px) scaleY(0.72); }
+    }
+
+    .robot-message {
+      right: -1% !important;
+      bottom: 9% !important;
+      width: 46% !important;
+      height: 46% !important;
+      border-radius: 50% !important;
+      background: linear-gradient(145deg, #ecfff1 0%, #38e891 38%, #19c46d 74%, #0a9e55 100%) !important;
+      box-shadow:
+        inset 7px 8px 14px rgba(255,255,255,0.48),
+        inset -8px -10px 16px rgba(0,79,47,0.24),
+        0 18px 34px rgba(0,0,0,0.24) !important;
+    }
+
+    .robot-message::before {
+      content: "☎" !important;
+      position: absolute !important;
+      left: 50% !important;
+      top: 50% !important;
+      width: auto !important;
+      height: auto !important;
+      transform: translate(-50%, -50%) rotate(-18deg) !important;
+      border: 0 !important;
+      background: transparent !important;
+      color: #ffffff !important;
+      font-family: Arial, sans-serif !important;
+      font-size: clamp(34px, 5vw, 54px) !important;
+      font-weight: 900 !important;
+      line-height: 1 !important;
+      text-shadow: 0 4px 10px rgba(0, 83, 45, 0.35) !important;
+      z-index: 3 !important;
+    }
+
+    .robot-message::after {
+      content: "" !important;
+      position: absolute !important;
+      left: 7% !important;
+      bottom: 4% !important;
+      width: 24% !important;
+      height: 24% !important;
+      border-radius: 3px 3px 3px 14px !important;
+      background: #ecfff1 !important;
+      transform: rotate(-16deg) !important;
+      z-index: 1 !important;
+      box-shadow: inset -5px -5px 10px rgba(0,79,47,0.16) !important;
+    }
+
+    .robot-3d {
+      animation:
+        robotIntro 0.86s cubic-bezier(.2,.75,.2,1) 0.28s both,
+        robotFloat 5.8s ease-in-out 1.18s infinite,
+        robotDrift 9s ease-in-out 1.18s infinite !important;
+    }
+  
+
+    /* ===== Final Logo + Mascot Consistency Override ===== */
+    .brand-eye-wink,
+    .mascot-wink-eye,
+    .brand-antenna,
+    .brand-mouth,
+    .robot-antenna {
+      display: none !important;
+    }
+
+    .brand-mark {
+      border-radius: 14px !important;
+      overflow: hidden !important;
+    }
+
+    .brand-mark::before {
+      content: "" !important;
+      position: absolute !important;
+      left: 50% !important;
+      top: 10px !important;
+      width: 26px !important;
+      height: 22px !important;
+      transform: translateX(-50%) !important;
+      border-radius: 10px !important;
+      background: rgba(5, 33, 20, 0.92) !important;
+      box-shadow:
+        inset 0 0 0 1px rgba(167, 255, 191, 0.18),
+        inset 0 5px 10px rgba(167, 255, 191, 0.08) !important;
+      z-index: 1 !important;
+    }
+
+    .brand-mark::after {
+      content: "" !important;
+      position: absolute !important;
+      left: 50% !important;
+      top: 18px !important;
+      width: 5px !important;
+      height: 5px !important;
+      border-radius: 50% !important;
+      background: var(--green-light) !important;
+      transform: translateX(-8px) !important;
+      box-shadow:
+        14px 0 0 var(--green-light),
+        0 0 10px rgba(167, 255, 191, 0.95),
+        16px 0 10px rgba(167, 255, 191, 0.95) !important;
+      z-index: 3 !important;
+      animation: bothLogoEyesBlink 5.4s ease-in-out infinite !important;
+    }
+
+    @keyframes bothLogoEyesBlink {
+      0%, 84%, 100% { transform: translateX(-8px) scaleY(1); }
+      88%, 92% { transform: translateX(-8px) scaleY(0.15); }
+    }
+
+    .robot-body {
+      left: 22% !important;
+      top: 18% !important;
+      width: 56% !important;
+      height: 60% !important;
+      border-radius: 26% !important;
+      background:
+        radial-gradient(circle at 28% 20%, rgba(255,255,255,0.86), transparent 32%),
+        linear-gradient(145deg, #ddffe8 0%, #9ff6bd 36%, #36e29a 72%, #0aa86d 100%) !important;
+      transform: rotateX(8deg) rotateY(-12deg) !important;
+      animation: robotBodyBreathSafe 6.5s ease-in-out infinite !important;
+    }
+
+    .robot-body::after {
+      content: "" !important;
+      position: absolute !important;
+      left: 50% !important;
+      top: 31% !important;
+      width: 54% !important;
+      height: 30% !important;
+      transform: translateX(-50%) !important;
+      border-radius: 14px !important;
+      background: rgba(5, 33, 20, 0.94) !important;
+      box-shadow:
+        inset 0 0 0 1px rgba(167, 255, 191, 0.18),
+        inset 0 8px 12px rgba(167, 255, 191, 0.07) !important;
+      z-index: 1 !important;
+    }
+
+    .robot-body::before {
+      content: "" !important;
+      position: absolute !important;
+      left: 50% !important;
+      top: 42% !important;
+      width: 7% !important;
+      height: 7% !important;
+      border-radius: 50% !important;
+      background: var(--green-light) !important;
+      transform: translateX(-12px) !important;
+      box-shadow:
+        12px 0 0 var(--green-light),
+        0 0 12px rgba(167,255,191,0.95),
+        24px 0 12px rgba(167,255,191,0.95) !important;
+      z-index: 3 !important;
+      animation: bothMascotEyesBlink 5.2s ease-in-out infinite !important;
+    }
+
+    @keyframes bothMascotEyesBlink {
+      0%, 84%, 100% { transform: translateX(-12px) scaleY(1); }
+      88%, 92% { transform: translateX(-12px) scaleY(0.14); }
+    }
+
+    .robot-message {
+      right: -4% !important;
+      bottom: 13% !important;
+      width: 44% !important;
+      height: 32% !important;
+      border-radius: 18px !important;
+      background: linear-gradient(145deg, #ecfff1 0%, #a7ffbf 45%, #7ff0ac 100%) !important;
+      box-shadow:
+        inset 7px 8px 14px rgba(255,255,255,0.48),
+        inset -8px -10px 16px rgba(0,79,47,0.18),
+        0 18px 34px rgba(0,0,0,0.24) !important;
+      animation: messageFloatSafe 5.2s ease-in-out infinite !important;
+    }
+
+    .robot-message::before,
+    .robot-message::after {
+      content: "" !important;
+      position: absolute !important;
+      left: 22% !important;
+      right: 22% !important;
+      height: 8% !important;
+      border: 0 !important;
+      border-radius: 999px !important;
+      background: rgba(6, 18, 11, 0.34) !important;
+      transform: none !important;
+      box-shadow: none !important;
+      z-index: 2 !important;
+    }
+
+    .robot-message::before { top: 34% !important; }
+    .robot-message::after { top: 56% !important; }
+  
+
+    /* ===== FINAL HTML/CSS ONLY: Two Dot Eyes + Blink Together ===== */
+    .brand-eye-wink,
+    .mascot-wink-eye,
+    .brand-antenna,
+    .brand-mouth,
+    .robot-antenna {
+      display: none !important;
+    }
+
+    .brand-mark::before {
+      content: "" !important;
+      position: absolute !important;
+      left: 50% !important;
+      top: 10px !important;
+      width: 26px !important;
+      height: 22px !important;
+      transform: translateX(-50%) !important;
+      border-radius: 10px !important;
+      background: rgba(5, 33, 20, 0.92) !important;
+      box-shadow:
+        inset 0 0 0 1px rgba(167, 255, 191, 0.18),
+        inset 0 5px 10px rgba(167, 255, 191, 0.08) !important;
+      z-index: 1 !important;
+    }
+
+    .brand-mark::after {
+      content: "" !important;
+      position: absolute !important;
+      left: 50% !important;
+      top: 18px !important;
+      width: 5px !important;
+      height: 5px !important;
+      border-radius: 50% !important;
+      background: var(--green-light) !important;
+      transform: translateX(-8px) scaleY(1) !important;
+      transform-origin: center !important;
+      box-shadow:
+        14px 0 0 var(--green-light),
+        0 0 10px rgba(167, 255, 191, 0.95),
+        16px 0 10px rgba(167, 255, 191, 0.95) !important;
+      z-index: 3 !important;
+      animation: winkBoxTwoEyesBlink 5.2s ease-in-out infinite !important;
+    }
+
+    @keyframes winkBoxTwoEyesBlink {
+      0%, 82%, 100% {
+        transform: translateX(-8px) scaleY(1);
+      }
+      86%, 90% {
+        transform: translateX(-8px) scaleY(0.16);
+      }
+    }
+
+    .robot-body::after {
+      content: "" !important;
+      position: absolute !important;
+      left: 50% !important;
+      top: 31% !important;
+      width: 54% !important;
+      height: 30% !important;
+      transform: translateX(-50%) !important;
+      border-radius: 14px !important;
+      background: rgba(5, 33, 20, 0.94) !important;
+      box-shadow:
+        inset 0 0 0 1px rgba(167, 255, 191, 0.18),
+        inset 0 8px 12px rgba(167, 255, 191, 0.07) !important;
+      z-index: 1 !important;
+    }
+
+    .robot-body::before {
+      content: "" !important;
+      position: absolute !important;
+      left: 50% !important;
+      top: 42% !important;
+      width: 7% !important;
+      height: 7% !important;
+      border-radius: 50% !important;
+      background: var(--green-light) !important;
+      transform: translateX(-12px) scaleY(1) !important;
+      transform-origin: center !important;
+      box-shadow:
+        20px 0 0 var(--green-light),
+        0 0 12px rgba(167,255,191,0.95),
+        24px 0 12px rgba(167,255,191,0.95) !important;
+      z-index: 3 !important;
+      animation: mascotTwoEyesBlink 5.2s ease-in-out infinite !important;
+    }
+
+    @keyframes mascotTwoEyesBlink {
+      0%, 82%, 100% {
+        transform: translateX(-12px) scaleY(1);
+      }
+      86%, 90% {
+        transform: translateX(-12px) scaleY(0.14);
+      }
+    }
+  
+
+    /* ===== FINAL OVERRIDE: Static Two Dot Eyes, No Blink/Wink ===== */
+    .brand-eye-wink,
+    .mascot-wink-eye,
+    .brand-antenna,
+    .brand-mouth,
+    .robot-antenna {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+    }
+
+    .brand-mark::after {
+      content: "" !important;
+      position: absolute !important;
+      left: 50% !important;
+      top: 18px !important;
+      width: 5px !important;
+      height: 5px !important;
+      border-radius: 50% !important;
+      background: var(--green-light) !important;
+      transform: translateX(-8px) !important;
+      animation: none !important;
+      box-shadow:
+        14px 0 0 var(--green-light),
+        0 0 10px rgba(167, 255, 191, 0.95),
+        16px 0 10px rgba(167, 255, 191, 0.95) !important;
+      z-index: 3 !important;
+    }
+
+    .robot-body::before {
+      content: "" !important;
+      position: absolute !important;
+      left: 50% !important;
+      top: 42% !important;
+      width: 7% !important;
+      height: 7% !important;
+      border-radius: 50% !important;
+      background: var(--green-light) !important;
+      transform: translateX(-12px) !important;
+      animation: none !important;
+      box-shadow:
+        20px 0 0 var(--green-light),
+        0 0 12px rgba(167,255,191,0.95),
+        24px 0 12px rgba(167,255,191,0.95) !important;
+      z-index: 3 !important;
+    }
+  
+
+    /* ===== FINAL Animation Patch: Both Eyes Blink + Mascot Lower + Donate Glow ===== */
+    .brand-mark::after {
+      animation: finalBothLogoEyesBlink 4.8s ease-in-out infinite !important;
+      transform-origin: center !important;
+    }
+
+    @keyframes finalBothLogoEyesBlink {
+      0%, 78%, 100% {
+        transform: translateX(-8px) scaleY(1) !important;
+      }
+      82%, 86% {
+        transform: translateX(-8px) scaleY(0.16) !important;
+      }
+      90%, 94% {
+        transform: translateX(-8px) scaleY(1) !important;
+      }
+    }
+
+    .robot-body::before {
+      animation: finalBothMascotEyesBlink 5.1s ease-in-out infinite !important;
+      transform-origin: center !important;
+    }
+
+    @keyframes finalBothMascotEyesBlink {
+      0%, 78%, 100% {
+        transform: translateX(-12px) scaleY(1) !important;
+      }
+      82%, 86% {
+        transform: translateX(-12px) scaleY(0.14) !important;
+      }
+      90%, 94% {
+        transform: translateX(-12px) scaleY(1) !important;
+      }
+    }
+
+    .donate-link {
+      animation: donateGlowLoop 2.8s ease-in-out infinite !important;
+    }
+
+    @keyframes donateGlowLoop {
+      0%, 100% {
+        box-shadow:
+          0 14px 34px rgba(54, 226, 154, 0.16),
+          0 0 0 rgba(167, 255, 191, 0) !important;
+        transform: translateY(0);
+      }
+      50% {
+        box-shadow:
+          0 18px 46px rgba(54, 226, 154, 0.32),
+          0 0 28px rgba(167, 255, 191, 0.34) !important;
+        transform: translateY(-1px);
+      }
+    }
+
+    @media (min-width: 901px) {
+      .robot-3d {
+        top: 62% !important;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .robot-3d {
+        top: auto !important;
+        margin: 22px auto 18px !important;
+      }
+    }
+  
+
+    /* ===== ABSOLUTE FINAL: WinkBox eyes blink together, mascot lower, donate glow ===== */
+    .brand-eye-wink,
+    .mascot-wink-eye,
+    .brand-antenna,
+    .brand-mouth,
+    .robot-antenna {
+      display: none !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+    }
+
+    .brand-mark::after {
+      content: "" !important;
+      position: absolute !important;
+      left: 50% !important;
+      top: 18px !important;
+      width: 5px !important;
+      height: 5px !important;
+      border-radius: 50% !important;
+      background: var(--green-light) !important;
+      transform: translateX(-6px) scaleY(1) !important;
+      transform-origin: center center !important;
+      box-shadow:
+        12px 0 0 var(--green-light),
+        0 0 10px rgba(167, 255, 191, 0.95),
+        12px 0 10px rgba(167, 255, 191, 0.95) !important;
+      z-index: 3 !important;
+      animation: winkBoxBlinkBothEyes 4.8s ease-in-out infinite !important;
+    }
+
+    @keyframes winkBoxBlinkBothEyes {
+      0%, 78%, 100% {
+        transform: translateX(-6px) scaleY(1);
+      }
+      82%, 86% {
+        transform: translateX(-6px) scaleY(0.14);
+      }
+      90%, 94% {
+        transform: translateX(-6px) scaleY(1);
+      }
+    }
+
+    .robot-body::before {
+      content: "" !important;
+      position: absolute !important;
+      left: 50% !important;
+      top: 42% !important;
+      width: 7% !important;
+      height: 7% !important;
+      border-radius: 50% !important;
+      background: var(--green-light) !important;
+      transform: translateX(-10px) scaleY(1) !important;
+      transform-origin: center center !important;
+      box-shadow:
+        20px 0 0 var(--green-light),
+        0 0 12px rgba(167,255,191,0.95),
+        20px 0 12px rgba(167,255,191,0.95) !important;
+      z-index: 3 !important;
+      animation: mascotBlinkBothEyes 5.1s ease-in-out infinite !important;
+    }
+
+    @keyframes mascotBlinkBothEyes {
+      0%, 78%, 100% {
+        transform: translateX(-10px) scaleY(1);
+      }
+      82%, 86% {
+        transform: translateX(-10px) scaleY(0.14);
+      }
+      90%, 94% {
+        transform: translateX(-10px) scaleY(1);
+      }
+    }
+
+    @media (min-width: 901px) {
+      .robot-3d {
+        top: 68% !important;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .robot-3d {
+        top: auto !important;
+        margin: 34px auto 20px !important;
+      }
+    }
+
+    .donate-link {
+      animation: donateGlowSoftLoop 2.8s ease-in-out infinite !important;
+      will-change: transform, box-shadow;
+    }
+
+    @keyframes donateGlowSoftLoop {
+      0%, 100% {
+        transform: translateY(0);
+        box-shadow:
+          0 12px 32px rgba(54, 226, 154, 0.18),
+          0 0 0 rgba(167, 255, 191, 0);
+      }
+      50% {
+        transform: translateY(-2px);
+        box-shadow:
+          0 20px 52px rgba(54, 226, 154, 0.34),
+          0 0 30px rgba(167, 255, 191, 0.36);
+      }
+    }
+  
+
+    /* ===== REAL EYE ELEMENTS: Logo + Mascot Blink ===== */
+    .brand-mark::after,
+    .robot-body::before {
+      display: none !important;
+      content: none !important;
+      animation: none !important;
+      box-shadow: none !important;
+    }
+
+    .robot-eye {
+      position: absolute !important;
+      top: 18px !important;
+      width: 5px !important;
+      height: 5px !important;
+      border-radius: 999px !important;
+      background: var(--green-light) !important;
+      z-index: 5 !important;
+      box-shadow: 0 0 10px rgba(167, 255, 191, 0.95) !important;
+      transform-origin: center center !important;
+      animation: realLogoBlink 4.2s ease-in-out infinite !important;
+    }
+
+    .robot-eye.eye-left { left: 15px !important; }
+    .robot-eye.eye-right { left: 27px !important; }
+
+    @keyframes realLogoBlink {
+      0%, 43%, 100% { transform: scaleY(1); }
+      46%, 50% { transform: scaleY(0.12); }
+      53%, 56% { transform: scaleY(1); }
+    }
+
+    .mascot-eye {
+      position: absolute !important;
+      top: 42% !important;
+      width: 7% !important;
+      height: 7% !important;
+      border-radius: 999px !important;
+      background: var(--green-light) !important;
+      z-index: 6 !important;
+      box-shadow: 0 0 12px rgba(167,255,191,0.95) !important;
+      transform-origin: center center !important;
+      animation: realMascotBlink 4.8s ease-in-out infinite !important;
+    }
+
+    .mascot-eye-left { left: 39% !important; }
+    .mascot-eye-right { left: 55% !important; }
+
+    @keyframes realMascotBlink {
+      0%, 43%, 100% { transform: scaleY(1); }
+      46%, 50% { transform: scaleY(0.12); }
+      53%, 56% { transform: scaleY(1); }
+    }
+  
+
+    /* ===== Eye Blink + Glance Animation: Logo + Mascot ===== */
+    .robot-eye {
+      animation: logoEyeBlinkGlance 6.4s ease-in-out infinite !important;
+      will-change: transform;
+    }
+
+    .mascot-eye {
+      animation: mascotEyeBlinkGlance 6.8s ease-in-out infinite !important;
+      will-change: transform;
+    }
+
+    @keyframes logoEyeBlinkGlance {
+      0%, 18% { transform: translateX(0) scaleY(1); }
+      22%, 30% { transform: translateX(2px) scaleY(1); }
+      34%, 42% { transform: translateX(-2px) scaleY(1); }
+      46%, 54% { transform: translateX(0) scaleY(1); }
+      58%, 61% { transform: translateX(0) scaleY(0.12); }
+      64%, 100% { transform: translateX(0) scaleY(1); }
+    }
+
+    @keyframes mascotEyeBlinkGlance {
+      0%, 18% { transform: translateX(0) scaleY(1); }
+      22%, 30% { transform: translateX(4px) scaleY(1); }
+      34%, 42% { transform: translateX(-4px) scaleY(1); }
+      46%, 54% { transform: translateX(0) scaleY(1); }
+      58%, 61% { transform: translateX(0) scaleY(0.12); }
+      64%, 100% { transform: translateX(0) scaleY(1); }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-loader" id="pageLoader" aria-label="Loading WinkBox">
+    <div class="loader-inner">
+      <div class="loader-logo">
+        <span class="brand-mark loader-mark"><span class="robot-eye eye-left"></span><span class="robot-eye eye-right"></span></span></span>
+        <span class="loader-name">WinkBox</span>
+      </div>
+      <div class="loader-line"><span></span></div>
+      <p>Preparing your smart link workspace...</p>
+    </div>
+  </div>
+  <div class="custom-cursor" id="customCursor"></div>
+
+  <div class="manual-copy" id="manualCopyModal" aria-hidden="true">
+    <div class="manual-copy-card">
+      <h3>Copy Link Manual</h3>
+      <p>Browser ini memblokir copy otomatis. Tekan dan tahan link di bawah, lalu pilih copy.</p>
+      <textarea id="manualCopyText" readonly></textarea>
+      <div class="btn-row">
+        <button class="btn-primary" type="button" id="selectManualCopyBtn">Select Link</button>
+        <button class="btn-secondary" type="button" id="closeManualCopyBtn">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="page">
+    <section class="hero">
+      <div class="hero-copy fade-up">
+        <div class="brand-logo" aria-label="WinkBox logo">
+          <span class="brand-mark"><span class="robot-eye eye-left"></span><span class="robot-eye eye-right"></span></span></span>
+          <span class="brand-name">WinkBox</span>
+        </div>
+        <div class="title-wrap">
+          <h1 class="title">
+            <span class="title-static">Create <span class="gradient-text">Link WA</span> yang</span>
+            <span class="typing-stage"><span class="typing-word" id="typingWord">rapi</span><span class="typing-cursor">|</span></span>
+          </h1>
+          <div class="robot-3d" aria-hidden="true">
+            <div class="robot-shadow"></div>
+            <div class="robot-antenna"></div>
+            <div class="robot-arm"></div>
+            <div class="robot-message"></div>
+            <div class="robot-body"><span class="mascot-eye mascot-eye-left"></span><span class="mascot-eye mascot-eye-right"></span></div>
+          </div>
+        </div>
+        <p class="subtitle"><strong><b>Tools 3 In 1 : </b></strong> Link Lengkap, Shortlink yang rapi, dan QR Code sekaligus dalam satu kali klik. Untuk mempermudah koneksi dalam berbagai aktivitas digital, marketing, dan profesional kamu</p>
+        <div class="use-cases">
+          <div class="use-case">
+            <strong>Bisnis &amp; UMKM</strong>
+            Cantumkan link di bio Instagram atau TikTok untuk mempercepat proses pemesanan dari calon pelanggan.
+          </div>
+          <div class="use-case">
+            <strong>Networking Profesional</strong>
+            Tambahkan QR Code pada kartu nama atau portofolio agar rekan bisnis bisa langsung menghubungi tanpa simpan nomor.
+          </div>
+          <div class="use-case">
+            <strong>Manajemen Event</strong>
+            Permudah pendaftaran peserta atau konfirmasi kehadiran (RSVP) melalui scan QR pada poster acara.
+          </div>
+          <div class="use-case">
+            <strong>Layanan Publik</strong>
+            Tempelkan QR Code di meja resto atau area layanan untuk aduan dan pemesanan yang lebih responsif.
+          </div>
+        </div>
+      </div>
+
+      <div class="card form-card fade-up delay-1">
+        <p class="card-kicker">Generator</p>
+        <h2 class="card-title">Buat Link Chat</h2>
+
+        <form class="form-grid" id="waForm">
+          <div class="field">
+            <label for="phoneNumber">Nomor WhatsApp Tujuan</label>
+            <input id="phoneNumber" type="tel" placeholder="Contoh: 6281234567890" autocomplete="off" required />
+            <p class="hint">Gunakan format internasional. Untuk Indonesia awali dengan 62, bukan 0.</p>
+          </div>
+
+          <div class="field">
+            <div class="field-head">
+              <label for="messageText">Pesan Otomatis</label>
+              <div class="output-actions">
+                <button class="message-toggle-btn" type="button" id="messageToggleBtn" aria-pressed="true">Pesan ON</button>
+                <button class="ai-agent-btn" type="button" id="winkAssistBtn">✨ WinkAssist</button>
+              </div>
+            </div>
+            <textarea id="messageText" placeholder="Halo, saya ingin bertanya tentang promo..." required></textarea>
+            <p class="hint">Opsional: gunakan WinkAssist untuk merapikan tanda baca dan membuat pesan lebih natural.</p>
+            <p class="message-disabled-note" id="messageDisabledNote">Pesan otomatis sedang nonaktif. Link WhatsApp akan dibuat tanpa teks bawaan.</p>
+
+            <div class="ai-agent-panel" id="winkAssistPanel">
+              <p class="ai-agent-title">Rekomendasi pesan</p>
+              <div class="ai-agent-result" id="winkAssistResult">Tulis pesan terlebih dahulu, lalu klik WinkAssist.</div>
+              <div class="ai-agent-actions">
+                <button class="btn-primary" type="button" id="useAiTextBtn">Gunakan Pesan Ini</button>
+                <button class="btn-secondary" type="button" id="refreshAiTextBtn">Buat Ulang</button>
+                <button class="btn-secondary" type="button" id="closeAiPanelBtn">Tutup</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="linkMode">Output Utama</label>
+            <select id="linkMode">
+              <option value="full">Link utuh tanpa diperpendek</option>
+              <option value="short">Shortlink</option>
+            </select>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn-primary" type="submit">Generate Link</button>
+            <button class="btn-secondary" type="button" id="resetBtn">Reset</button>
+          </div>
+
+          <p class="status" id="statusText">Isi data dulu, nanti hasilnya muncul otomatis di bawah.</p>
+        </form>
+      </div>
+    </section>
+
+    <section class="card result-card fade-up delay-2" id="resultCard">
+      <div class="result-grid">
+        <div class="output-list">
+          <div class="output-box">
+            <div class="output-head">
+              <span>Link Utuh</span>
+              <div class="output-actions">
+                <button class="open-btn" type="button" data-open="fullLinkOutput">Open</button>
+                <button class="copy-btn" type="button" data-copy="fullLinkOutput">Copy</button>
+              </div>
+            </div>
+            <a href="#" target="_blank" rel="noopener" class="output-link" id="fullLinkOutput">-</a>
+          </div>
+
+          <div class="output-box is-hidden" id="shortLinkBox">
+            <div class="output-head">
+              <span>Shortlink</span>
+              <div class="output-actions">
+                <button class="open-btn" type="button" data-open="shortLinkOutput">Open</button>
+                <button class="copy-btn" type="button" data-copy="shortLinkOutput">Copy</button>
+              </div>
+            </div>
+            <a href="#" target="_blank" rel="noopener" class="output-link" id="shortLinkOutput">Belum dibuat</a>
+          </div>
+
+          <div class="note">Link WhatsApp dan QR Code akan dibuat otomatis sesuai format yang dipilih.</div>
+        </div>
+
+        <div class="qr-grid" id="qrGrid">
+          <div class="qr-wrap" id="fullQrWrap">
+            <p class="qr-title">QR Link Utuh</p>
+            <div class="qr-code" id="fullQrCode"></div>
+            <p class="qr-caption">Scan untuk membuka link WhatsApp utuh.</p>
+            <button class="btn-primary" type="button" data-download-qr="fullQrCode">Download QR</button>
+          </div>
+
+          <div class="qr-wrap is-hidden" id="shortQrWrap">
+            <p class="qr-title">QR Shortlink</p>
+            <div class="qr-code" id="shortQrCode"></div>
+            <p class="qr-caption">Scan untuk membuka shortlink.</p>
+            <button class="btn-primary" type="button" data-download-qr="shortQrCode">Download QR</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="donate-section">
+      <a class="donate-link" href="https://link.dana.id/minta?full_url=https://qr.dana.id/v1/281012012021042587252600" target="_blank" rel="noopener">Donate</a>
+    </section>
+
+    <footer class="footer">
+      <a href="https://www.instagram.com/lukmankhm/" target="_blank" rel="noopener">Made with ❤️ by @lukmankhm</a>
+    </footer>
+  </main>
+
+  <script>
+    (function () {
+      function getEl(id) {
+        return document.getElementById(id);
+      }
+
+      function setStatus(message, type) {
+        var statusText = getEl("statusText");
+        if (!statusText) return;
+        statusText.textContent = message;
+        statusText.className = "status " + (type || "default");
+      }
+
+      function hideLoader() {
+        window.setTimeout(function () {
+          var loader = getEl("pageLoader");
+          if (loader) loader.classList.add("is-hidden");
+          document.body.classList.add("is-loaded");
+          startTypingLoop();
+        }, 900);
+      }
+
+      function onlyNumbers(value) {
+        var text = String(value || "");
+        var output = "";
+        for (var i = 0; i < text.length; i++) {
+          var char = text.charAt(i);
+          if (char >= "0" && char <= "9") output += char;
+        }
+        return output;
+      }
+
+      function cleanPhoneNumber(phone) {
+        var clean = onlyNumbers(phone);
+        if (clean.charAt(0) === "0") clean = "62" + clean.slice(1);
+        return clean;
+      }
+
+      function createWhatsAppLink(phone, message) {
+        var cleanPhone = cleanPhoneNumber(phone);
+        var encodedMessage = encodeURIComponent(String(message || "").trim());
+        return "https://wa.me/" + cleanPhone + "?text=" + encodedMessage;
+      }
+
+      function setOutputLink(element, link) {
+        if (!element) return;
+        element.textContent = link;
+        element.href = link;
+        element.setAttribute("data-link", link);
+        element.setAttribute("aria-label", link);
+      }
+
+      function getOutputLinkById(id) {
+        var target = getEl(id);
+        if (!target) return "";
+        return target.getAttribute("data-link") || target.textContent.trim();
+      }
+
+      function resetShortLinkOutput() {
+        var shortLinkBox = getEl("shortLinkBox");
+        var shortLinkOutput = getEl("shortLinkOutput");
+        var shortQrWrap = getEl("shortQrWrap");
+        var shortQrCode = getEl("shortQrCode");
+
+        if (shortLinkBox) shortLinkBox.classList.add("is-hidden");
+        if (shortLinkOutput) {
+          shortLinkOutput.textContent = "Belum dibuat";
+          shortLinkOutput.href = "#";
+          shortLinkOutput.removeAttribute("data-link");
+        }
+        if (shortQrWrap) shortQrWrap.classList.add("is-hidden");
+        if (shortQrCode) shortQrCode.innerHTML = "";
+      }
+
+      function renderQrCode(container, link) {
+        if (!container) return;
+        container.innerHTML = "";
+
+        if (window.QRCode) {
+          new QRCode(container, {
+            text: link,
+            width: 210,
+            height: 210,
+            colorDark: "#06120b",
+            colorLight: "#ecfff1",
+            correctLevel: QRCode.CorrectLevel.H
+          });
+          return;
+        }
+
+        var img = document.createElement("img");
+        img.width = 210;
+        img.height = 210;
+        img.alt = "QR Code";
+        img.src = "https://api.qrserver.com/v1/create-qr-code/?size=210x210&data=" + encodeURIComponent(link);
+        container.appendChild(img);
+      }
+
+      async function shortenLink(longUrl) {
+        var endpoints = [
+          "https://v.gd/create.php?format=simple&url=" + encodeURIComponent(longUrl),
+          "https://is.gd/create.php?format=simple&url=" + encodeURIComponent(longUrl)
+        ];
+
+        var lastError = null;
+        for (var i = 0; i < endpoints.length; i++) {
+          try {
+            var response = await fetch(endpoints[i]);
+            if (!response.ok) throw new Error("Shortlink API gagal.");
+            var shortLink = (await response.text()).trim();
+            if (shortLink && shortLink.indexOf("http") === 0) return shortLink;
+            throw new Error("Shortlink tidak valid.");
+          } catch (error) {
+            lastError = error;
+          }
+        }
+
+        throw lastError || new Error("Gagal membuat shortlink.");
+      }
+
+      function normalizeSpaces(text) {
+        var value = String(text || "").trim();
+        value = value.split(String.fromCharCode(10)).join(" ");
+        value = value.split(String.fromCharCode(9)).join(" ");
+        while (value.indexOf("  ") !== -1) value = value.split("  ").join(" ");
+        return value.trim();
+      }
+
+      function cleanPunctuation(text) {
+        var value = normalizeSpaces(text);
+        var marks = [",", ".", "?", "!"];
+        for (var i = 0; i < marks.length; i++) {
+          var mark = marks[i];
+          value = value.split(" " + mark).join(mark);
+          value = value.split(mark).join(mark + " ");
+        }
+        return normalizeSpaces(value);
+      }
+
+      function fixCommonWords(text) {
+        var dictionary = {
+          sy: "saya", sya: "saya", aq: "saya", aku: "saya", gw: "saya", gue: "saya",
+          km: "kamu", kmu: "kamu", ga: "tidak", gk: "tidak", ngga: "tidak", nggak: "tidak",
+          tdk: "tidak", yg: "yang", dgn: "dengan", utk: "untuk", dr: "dari", dlm: "dalam",
+          krn: "karena", trs: "terus", bs: "bisa", bsa: "bisa", sm: "sama", wa: "WhatsApp",
+          kak: "Kak", min: "Admin", admin: "Admin"
+        };
+
+        var words = normalizeSpaces(text).split(" ");
+        return words.map(function (word) {
+          var ending = "";
+          var lastChar = word.slice(-1);
+          if ([".", ",", "?", "!"].indexOf(lastChar) !== -1) {
+            ending = lastChar;
+            word = word.slice(0, -1);
+          }
+          var lower = word.toLowerCase();
+          return (dictionary[lower] || word) + ending;
+        }).join(" ");
+      }
+
+      function capitalizeSentences(text) {
+        var value = String(text || "");
+        var result = "";
+        var shouldCapitalize = true;
+
+        for (var i = 0; i < value.length; i++) {
+          var char = value.charAt(i);
+          if (shouldCapitalize && char !== " ") {
+            result += char.toUpperCase();
+            shouldCapitalize = false;
+          } else {
+            result += char;
+          }
+
+          if (char === "." || char === "?" || char === "!") {
+            shouldCapitalize = true;
+          }
+        }
+        return result;
+      }
+
+      function normalizeMessageText(text) {
+        var result = cleanPunctuation(text);
+        result = fixCommonWords(result);
+        result = cleanPunctuation(result);
+        result = capitalizeSentences(result);
+        var last = result.slice(-1);
+        if (result && last !== "." && last !== "?" && last !== "!") result += ".";
+        return result;
+      }
+
+      function makeRecommendation(cleanText) {
+        var lower = cleanText.toLowerCase();
+        var subject = cleanText;
+        var last = subject.slice(-1);
+        if (last === "." || last === "?" || last === "!") subject = subject.slice(0, -1);
+
+        if (lower.indexOf("promo") !== -1 || lower.indexOf("diskon") !== -1 || lower.indexOf("voucher") !== -1) {
+          return "Halo Kak, saya ingin bertanya apakah promo atau voucher yang tersedia saat ini masih bisa digunakan? Mohon informasinya ya. Terima kasih.";
+        }
+        if (lower.indexOf("booking") !== -1 || lower.indexOf("jadwal") !== -1 || lower.indexOf("reservasi") !== -1 || lower.indexOf("daftar") !== -1 || lower.indexOf("registrasi") !== -1) {
+          return "Halo Kak, saya ingin melakukan booking atau pendaftaran jadwal. Mohon dibantu informasinya terkait ketersediaan waktu dan proses selanjutnya. Terima kasih.";
+        }
+        if (lower.indexOf("harga") !== -1 || lower.indexOf("biaya") !== -1 || lower.indexOf("paket") !== -1 || lower.indexOf("tarif") !== -1) {
+          return "Halo Kak, saya ingin bertanya mengenai harga, paket, atau biaya layanan yang tersedia. Mohon informasinya ya. Terima kasih.";
+        }
+        if (lower.indexOf("alamat") !== -1 || lower.indexOf("lokasi") !== -1 || lower.indexOf("cabang") !== -1) {
+          return "Halo Kak, saya ingin bertanya mengenai alamat atau lokasi layanan. Mohon dibantu informasinya ya. Terima kasih.";
+        }
+        if (lower.indexOf("komplain") !== -1 || lower.indexOf("keluhan") !== -1 || lower.indexOf("aduan") !== -1) {
+          return "Halo Kak, saya ingin menyampaikan keluhan terkait layanan. Mohon dibantu untuk proses tindak lanjutnya ya. Terima kasih.";
+        }
+
+        return "Halo Kak, saya ingin bertanya mengenai " + subject + ". Mohon dibantu informasinya ya. Terima kasih.";
+      }
+
+      function improveMessageText(text) {
+        var normalized = normalizeMessageText(text);
+        if (!normalized) return "";
+        return makeRecommendation(normalized);
+      }
+
+      function runAiAgent(event) {
+        if (event) event.preventDefault();
+        var messageTextInput = getEl("messageText");
+        var winkAssistPanel = getEl("winkAssistPanel");
+        var winkAssistResult = getEl("winkAssistResult");
+        var currentMessage = messageTextInput ? messageTextInput.value.trim() : "";
+
+        if (winkAssistPanel) winkAssistPanel.classList.add("is-visible");
+
+        if (!currentMessage) {
+          if (winkAssistResult) winkAssistResult.textContent = "Tulis pesan terlebih dahulu, lalu klik WinkAssist untuk mendapatkan rekomendasi.";
+          setStatus("Tulis pesan dulu sebelum memakai WinkAssist.", "error");
+          return;
+        }
+
+        if (winkAssistResult) winkAssistResult.textContent = "Menganalisis dan merapikan pesan...";
+        setStatus("WinkAssist sedang menyiapkan rekomendasi...", "default");
+
+        window.setTimeout(function () {
+          if (winkAssistResult) winkAssistResult.textContent = improveMessageText(currentMessage);
+          setStatus("WinkAssist berhasil membuat rekomendasi pesan.", "success");
+        }, 420);
+      }
+
+      function useAiText(event) {
+        if (event) event.preventDefault();
+        var messageTextInput = getEl("messageText");
+        var winkAssistPanel = getEl("winkAssistPanel");
+        var winkAssistResult = getEl("winkAssistResult");
+        var improvedText = winkAssistResult ? winkAssistResult.textContent.trim() : "";
+
+        if (!improvedText || improvedText.indexOf("Tulis pesan") !== -1 || improvedText.indexOf("Menganalisis") !== -1) {
+          setStatus("Belum ada rekomendasi pesan yang bisa digunakan.", "error");
+          return;
+        }
+
+        if (messageTextInput) messageTextInput.value = improvedText;
+        if (winkAssistPanel) winkAssistPanel.classList.remove("is-visible");
+        setStatus("Pesan dari WinkAssist sudah digunakan.", "success");
+      }
+
+      async function generateLink(event) {
+        if (event) event.preventDefault();
+
+        var phoneNumberInput = getEl("phoneNumber");
+        var messageTextInput = getEl("messageText");
+        var linkModeInput = getEl("linkMode");
+        var resultCard = getEl("resultCard");
+        var fullLinkOutput = getEl("fullLinkOutput");
+        var fullQrCode = getEl("fullQrCode");
+        var shortLinkBox = getEl("shortLinkBox");
+        var shortQrWrap = getEl("shortQrWrap");
+        var shortLinkOutput = getEl("shortLinkOutput");
+        var shortQrCode = getEl("shortQrCode");
+
+        var phone = phoneNumberInput ? phoneNumberInput.value.trim() : "";
+        var message = messageTextInput ? messageTextInput.value.trim() : "";
+        var mode = linkModeInput ? linkModeInput.value : "full";
+
+        if (!phone || !message) {
+          setStatus("Nomor dan pesan wajib diisi.", "error");
+          return;
+        }
+
+        var fullLink = createWhatsAppLink(phone, message);
+        if (resultCard) resultCard.classList.add("is-visible");
+        setOutputLink(fullLinkOutput, fullLink);
+        resetShortLinkOutput();
+        renderQrCode(fullQrCode, fullLink);
+        setStatus("Link dan QR Code berhasil dibuat.", "success");
+
+        if (mode === "short") {
+          try {
+            setStatus("Membuat shortlink...", "default");
+            var shortLink = await shortenLink(fullLink);
+            if (shortLinkBox) shortLinkBox.classList.remove("is-hidden");
+            if (shortQrWrap) shortQrWrap.classList.remove("is-hidden");
+            setOutputLink(shortLinkOutput, shortLink);
+            renderQrCode(shortQrCode, shortLink);
+            setStatus("Link, shortlink, dan QR Code berhasil dibuat.", "success");
+          } catch (error) {
+            setStatus((error && error.message ? error.message : "Shortlink gagal dibuat") + " QR link utuh tetap berhasil dibuat.", "error");
+          }
+        }
+      }
+
+      function showManualCopy(link) {
+        var manualCopyModal = getEl("manualCopyModal");
+        var manualCopyText = getEl("manualCopyText");
+        if (!manualCopyModal || !manualCopyText) return;
+        manualCopyText.value = link;
+        manualCopyModal.classList.add("is-visible");
+        manualCopyModal.setAttribute("aria-hidden", "false");
+        window.setTimeout(function () {
+          manualCopyText.focus();
+          manualCopyText.select();
+          manualCopyText.setSelectionRange(0, manualCopyText.value.length);
+        }, 60);
+      }
+
+      async function copyText(link) {
+        if (!link || link === "#" || link === "-") throw new Error("Tidak ada link yang bisa disalin.");
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(link);
+            return "auto";
+          }
+        } catch (error) {}
+        showManualCopy(link);
+        return "manual";
+      }
+
+      function openLink(link) {
+        if (!link || link === "#" || link === "-") {
+          setStatus("Belum ada link yang bisa dibuka.", "error");
+          return;
+        }
+        var newWindow = window.open(link, "_blank");
+        if (!newWindow) window.location.href = link;
+      }
+
+      function downloadQrCode(containerId) {
+        var container = getEl(containerId);
+        var qrCanvas = container ? container.querySelector("canvas") : null;
+        var qrImage = container ? container.querySelector("img") : null;
+        var imageUrl = qrCanvas ? qrCanvas.toDataURL("image/png") : qrImage ? qrImage.src : "";
+        if (!imageUrl) {
+          setStatus("QR Code belum tersedia.", "error");
+          return;
+        }
+        var link = document.createElement("a");
+        link.href = imageUrl;
+        link.download = containerId + ".png";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      function resetAll() {
+        var form = getEl("waForm");
+        var winkAssistPanel = getEl("winkAssistPanel");
+        var winkAssistResult = getEl("winkAssistResult");
+        var fullQrCode = getEl("fullQrCode");
+        var shortQrCode = getEl("shortQrCode");
+        var resultCard = getEl("resultCard");
+
+        if (form) form.reset();
+        if (winkAssistPanel) winkAssistPanel.classList.remove("is-visible");
+        if (winkAssistResult) winkAssistResult.textContent = "Tulis pesan terlebih dahulu, lalu klik WinkAssist.";
+        if (fullQrCode) fullQrCode.innerHTML = "";
+        if (shortQrCode) shortQrCode.innerHTML = "";
+        resetShortLinkOutput();
+        if (resultCard) resultCard.classList.remove("is-visible");
+        setStatus("Form sudah direset.", "default");
+      }
+
+      function startTypingLoop() {
+        var typingWord = getEl("typingWord");
+        if (!typingWord || window.__winkBoxTypingStarted) return;
+        window.__winkBoxTypingStarted = true;
+
+        var words = ["rapi", "cepat", "siap digunakan"];
+        var wordIndex = 0;
+        var charIndex = 0;
+        var deleting = false;
+        typingWord.textContent = "";
+
+        function tick() {
+          var word = words[wordIndex];
+          if (!deleting) {
+            charIndex += 1;
+            typingWord.textContent = word.slice(0, charIndex);
+            if (charIndex >= word.length) {
+              deleting = true;
+              window.setTimeout(tick, 2200);
+              return;
+            }
+            window.setTimeout(tick, 95);
+            return;
+          }
+
+          charIndex -= 1;
+          typingWord.textContent = word.slice(0, Math.max(0, charIndex));
+          if (charIndex <= 0) {
+            deleting = false;
+            wordIndex = (wordIndex + 1) % words.length;
+            window.setTimeout(tick, 520);
+            return;
+          }
+          window.setTimeout(tick, 58);
+        }
+
+        tick();
+      }
+
+      function initCustomCursor() {
+        var customCursor = getEl("customCursor");
+        if (!customCursor || window.matchMedia("(max-width: 900px)").matches) {
+          if (customCursor) customCursor.style.display = "none";
+          return;
+        }
+        document.addEventListener("mousemove", function (event) {
+          customCursor.style.opacity = "1";
+          customCursor.style.left = event.clientX + "px";
+          customCursor.style.top = event.clientY + "px";
+        });
+        document.addEventListener("mouseleave", function () {
+          customCursor.style.opacity = "0";
+        });
+      }
+
+      function init() {
+        hideLoader();
+        initCustomCursor();
+
+        var form = getEl("waForm");
+        var winkAssistBtn = getEl("winkAssistBtn");
+        var refreshAiTextBtn = getEl("refreshAiTextBtn");
+        var useAiTextBtn = getEl("useAiTextBtn");
+        var closeAiPanelBtn = getEl("closeAiPanelBtn");
+        var resetBtn = getEl("resetBtn");
+        var selectManualCopyBtn = getEl("selectManualCopyBtn");
+        var closeManualCopyBtn = getEl("closeManualCopyBtn");
+        var manualCopyModal = getEl("manualCopyModal");
+
+        if (winkAssistBtn) winkAssistBtn.addEventListener("click", runAiAgent);
+        if (refreshAiTextBtn) refreshAiTextBtn.addEventListener("click", runAiAgent);
+        if (useAiTextBtn) useAiTextBtn.addEventListener("click", useAiText);
+        if (closeAiPanelBtn) closeAiPanelBtn.addEventListener("click", function () {
+          var panel = getEl("winkAssistPanel");
+          if (panel) panel.classList.remove("is-visible");
+        });
+        if (form) form.addEventListener("submit", generateLink);
+        if (resetBtn) resetBtn.addEventListener("click", resetAll);
+
+        document.querySelectorAll(".copy-btn").forEach(function (button) {
+          button.addEventListener("click", async function () {
+            var link = getOutputLinkById(button.getAttribute("data-copy"));
+            try {
+              var result = await copyText(link);
+              if (result === "manual") setStatus("Copy otomatis diblokir browser. Silakan copy manual dari popup.", "error");
+              else setStatus("Link berhasil disalin.", "success");
+            } catch (error) {
+              showManualCopy(link);
+              setStatus("Copy otomatis diblokir browser. Silakan copy manual dari popup.", "error");
+            }
+          });
+        });
+
+        document.querySelectorAll(".open-btn").forEach(function (button) {
+          button.addEventListener("click", function () {
+            openLink(getOutputLinkById(button.getAttribute("data-open")));
+          });
+        });
+
+        document.querySelectorAll("[data-download-qr]").forEach(function (button) {
+          button.addEventListener("click", function () {
+            downloadQrCode(button.getAttribute("data-download-qr"));
+          });
+        });
+
+        if (selectManualCopyBtn) selectManualCopyBtn.addEventListener("click", function () {
+          var manualCopyText = getEl("manualCopyText");
+          if (!manualCopyText) return;
+          manualCopyText.focus();
+          manualCopyText.select();
+          manualCopyText.setSelectionRange(0, manualCopyText.value.length);
+        });
+
+        if (closeManualCopyBtn) closeManualCopyBtn.addEventListener("click", function () {
+          var modal = getEl("manualCopyModal");
+          if (modal) {
+            modal.classList.remove("is-visible");
+            modal.setAttribute("aria-hidden", "true");
+          }
+        });
+
+        if (manualCopyModal) manualCopyModal.addEventListener("click", function (event) {
+          if (event.target === manualCopyModal) {
+            manualCopyModal.classList.remove("is-visible");
+            manualCopyModal.setAttribute("aria-hidden", "true");
+          }
+        });
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+      } else {
+        init();
+      }
+    })();
+  </script>
+  <script>
+    (function () {
+      function el(id) { return document.getElementById(id); }
+      function status(msg, type) {
+        var s = el('statusText');
+        if (!s) return;
+        s.textContent = msg;
+        s.className = 'status ' + (type || 'default');
+      }
+      function digits(v) {
+        var t = String(v || '');
+        var out = '';
+        for (var i = 0; i < t.length; i++) {
+          var c = t.charAt(i);
+          if (c >= '0' && c <= '9') out += c;
+        }
+        return out;
+      }
+      function phone(v) {
+        var n = digits(v);
+        if (n.charAt(0) === '0') n = '62' + n.slice(1);
+        return n;
+      }
+      function waLink(p, m) {
+        var clean = phone(p);
+        var msg = String(m || '').trim();
+        if (!msg) return 'https://wa.me/' + clean;
+        return 'https://wa.me/' + clean + '?text=' + encodeURIComponent(msg);
+      }
+      function putLink(node, url) {
+        if (!node) return;
+        node.textContent = url;
+        node.href = url;
+        node.setAttribute('data-link', url);
+      }
+      function readLink(id) {
+        var n = el(id);
+        if (!n) return '';
+        return n.getAttribute('data-link') || n.textContent.trim();
+      }
+      function qrImg(box, url) {
+        var img = document.createElement('img');
+        img.width = 210;
+        img.height = 210;
+        img.alt = 'QR Code';
+        img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=210x210&data=' + encodeURIComponent(url);
+        box.appendChild(img);
+      }
+      function qr(box, url) {
+        if (!box) return;
+        box.innerHTML = '';
+        try {
+          if (window.QRCode) {
+            new QRCode(box, { text: url, width: 210, height: 210, colorDark: '#06120b', colorLight: '#ecfff1', correctLevel: QRCode.CorrectLevel.H });
+          } else {
+            qrImg(box, url);
+          }
+        } catch (e) {
+          box.innerHTML = '';
+          qrImg(box, url);
+        }
+      }
+      function resetShort() {
+        if (el('shortLinkBox')) el('shortLinkBox').classList.add('is-hidden');
+        if (el('shortQrWrap')) el('shortQrWrap').classList.add('is-hidden');
+        if (el('shortQrCode')) el('shortQrCode').innerHTML = '';
+        if (el('shortLinkOutput')) {
+          el('shortLinkOutput').textContent = 'Belum dibuat';
+          el('shortLinkOutput').href = '#';
+          el('shortLinkOutput').removeAttribute('data-link');
+        }
+      }
+      async function shorten(url) {
+        var services = [
+          'https://is.gd/create.php?format=simple&url=' + encodeURIComponent(url),
+          'https://v.gd/create.php?format=simple&url=' + encodeURIComponent(url)
+        ];
+
+        var lastError = null;
+
+        for (var i = 0; i < services.length; i++) {
+          try {
+            var proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(services[i]);
+            var res = await fetch(proxyUrl, {
+              method: 'GET',
+              cache: 'no-store',
+              headers: {
+                'Accept': 'text/plain'
+              }
+            });
+            if (!res.ok) throw new Error('Shortlink API gagal.');
+
+            var text = (await res.text()).trim();
+            if (text.indexOf('http') === 0) return text;
+
+            throw new Error('Shortlink tidak valid.');
+          } catch (e) {
+            lastError = e;
+          }
+        }
+
+        console.error(lastError);
+        throw lastError || new Error('Gagal membuat shortlink.');
+      }
+      function generate(e) {
+        if (e) { e.preventDefault(); e.stopPropagation(); if (e.stopImmediatePropagation) e.stopImmediatePropagation(); }
+        var p = el('phoneNumber') ? el('phoneNumber').value.trim() : '';
+        var msgEnabled = el('messageToggleBtn') ? el('messageToggleBtn').getAttribute('aria-pressed') !== 'false' : true;
+        var m = msgEnabled && el('messageText') ? el('messageText').value.trim() : '';
+        var mode = el('linkMode') ? el('linkMode').value : 'full';
+        if (!p) { status('Nomor WhatsApp wajib diisi.', 'error'); return false; }
+        if (msgEnabled && !m) { status('Pesan wajib diisi, atau nonaktifkan Pesan ON jika ingin tanpa pesan.', 'error'); return false; }
+        var full = waLink(p, m);
+        if (el('resultCard')) el('resultCard').classList.add('is-visible');
+        putLink(el('fullLinkOutput'), full);
+        resetShort();
+        qr(el('fullQrCode'), full);
+        status('Link utuh dan QR Code berhasil dibuat.', 'success');
+        if (mode === 'short') {
+          status('Membuat shortlink...', 'default');
+          shorten(full).then(function (s) {
+            if (el('shortLinkBox')) el('shortLinkBox').classList.remove('is-hidden');
+            if (el('shortQrWrap')) el('shortQrWrap').classList.remove('is-hidden');
+            putLink(el('shortLinkOutput'), s);
+            qr(el('shortQrCode'), s);
+            status('Link utuh, shortlink, dan QR Code berhasil dibuat.', 'success');
+          }).catch(function (err) {
+            status((err && err.message ? err.message : 'Shortlink gagal dibuat') + ' QR link utuh tetap berhasil dibuat.', 'error');
+          });
+        }
+        return false;
+      }
+      function tidy(text) {
+        var dict = { sy:'saya', sya:'saya', aq:'saya', aku:'saya', gw:'saya', gue:'saya', km:'kamu', kmu:'kamu', ga:'tidak', gk:'tidak', ngga:'tidak', nggak:'tidak', tdk:'tidak', yg:'yang', dgn:'dengan', utk:'untuk', dr:'dari', dlm:'dalam', krn:'karena', bs:'bisa', bsa:'bisa', wa:'WhatsApp', kak:'Kak', min:'Admin' };
+        var v = String(text || '').trim();
+        while (v.indexOf('  ') !== -1) v = v.split('  ').join(' ');
+        var arr = v.split(' ');
+        for (var i = 0; i < arr.length; i++) {
+          var w = arr[i];
+          var end = '';
+          var last = w.slice(-1);
+          if (last === '.' || last === ',' || last === '?' || last === '!') { end = last; w = w.slice(0, -1); }
+          var fixed = dict[w.toLowerCase()] || w;
+          arr[i] = fixed + end;
+        }
+        v = arr.join(' ').trim();
+        if (v) v = v.charAt(0).toUpperCase() + v.slice(1);
+        var l = v.slice(-1);
+        if (v && l !== '.' && l !== '?' && l !== '!') v += '.';
+        return v;
+      }
+      function pick(list) {
+        return list[Math.floor(Math.random() * list.length)];
+      }
+
+      function detectIntent(clean) {
+        var low = clean.toLowerCase();
+        if (low.indexOf('promo') >= 0 || low.indexOf('diskon') >= 0 || low.indexOf('voucher') >= 0) return 'promo';
+        if (low.indexOf('booking') >= 0 || low.indexOf('jadwal') >= 0 || low.indexOf('reservasi') >= 0 || low.indexOf('daftar') >= 0) return 'booking';
+        if (low.indexOf('harga') >= 0 || low.indexOf('biaya') >= 0 || low.indexOf('paket') >= 0 || low.indexOf('tarif') >= 0) return 'harga';
+        if (low.indexOf('alamat') >= 0 || low.indexOf('lokasi') >= 0 || low.indexOf('cabang') >= 0) return 'lokasi';
+        if (low.indexOf('komplain') >= 0 || low.indexOf('keluhan') >= 0 || low.indexOf('aduan') >= 0) return 'keluhan';
+        if (low.indexOf('order') >= 0 || low.indexOf('pesan') >= 0 || low.indexOf('beli') >= 0) return 'order';
+        return 'general';
+      }
+
+      function pick(list) {
+        return list[Math.floor(Math.random() * list.length)];
+      }
+      function improve(text) {
+        var c = tidy(text);
+        if (!c) return '';
+
+        var subject = c;
+        var last = subject.slice(-1);
+        if (last === '.' || last === '?' || last === '!') subject = subject.slice(0, -1);
+
+        var low = c.toLowerCase();
+        var openers = ['Halo Kak', 'Hai Kak', 'Assalamu\'alaikum Kak', 'Halo Admin', 'Permisi Kak'];
+        var closers = ['Mohon dibantu informasinya ya. Terima kasih.', 'Boleh dibantu informasinya? Terima kasih.', 'Mohon arahannya ya Kak. Terima kasih.', 'Ditunggu informasinya ya. Terima kasih.', 'Terima kasih sebelumnya.'];
+        var bodies = [];
+
+        if (low.indexOf('promo') >= 0 || low.indexOf('diskon') >= 0 || low.indexOf('voucher') >= 0) {
+          bodies = ['saya ingin bertanya apakah promo atau voucher yang tersedia saat ini masih bisa digunakan', 'saya ingin cek informasi promo atau voucher yang sedang berlaku', 'saya tertarik dengan promo yang tersedia dan ingin tahu detailnya', 'saya ingin memastikan apakah diskon atau voucher saat ini masih tersedia'];
+        } else if (low.indexOf('booking') >= 0 || low.indexOf('jadwal') >= 0 || low.indexOf('reservasi') >= 0 || low.indexOf('daftar') >= 0) {
+          bodies = ['saya ingin melakukan booking jadwal dan mengetahui ketersediaan waktunya', 'saya ingin melakukan pendaftaran. Mohon dibantu proses selanjutnya', 'saya ingin reservasi jadwal. Boleh dibantu info waktu yang tersedia', 'saya ingin mengatur jadwal kunjungan atau pendaftaran'];
+        } else if (low.indexOf('harga') >= 0 || low.indexOf('biaya') >= 0 || low.indexOf('paket') >= 0) {
+          bodies = ['saya ingin bertanya mengenai harga, paket, atau biaya layanan yang tersedia', 'saya ingin mengetahui detail biaya dan pilihan paketnya', 'saya ingin cek informasi harga terbaru untuk layanan tersebut', 'saya ingin membandingkan paket atau biaya layanan yang tersedia'];
+        } else if (low.indexOf('alamat') >= 0 || low.indexOf('lokasi') >= 0 || low.indexOf('cabang') >= 0 || low.indexOf('jakarta') >= 0) {
+          bodies = ['saya ingin bertanya mengenai alamat atau lokasi layanan', 'saya ingin mengetahui lokasi lengkap dan jam operasionalnya', 'saya ingin cek alamat cabang atau lokasi terdekat', 'saya butuh informasi lokasi dan panduan menuju tempatnya'];
+        } else {
+          bodies = ['saya ingin bertanya mengenai ' + subject, 'saya membutuhkan informasi lebih lanjut tentang ' + subject, 'saya ingin memastikan detail terkait ' + subject, 'saya tertarik mengetahui informasi mengenai ' + subject, 'saya ingin konsultasi singkat terkait ' + subject, 'saya ingin menanyakan detail tentang ' + subject];
+        }
+
+        return pick(openers) + ', ' + pick(bodies) + '. ' + pick(closers);
+      }
+      function ai(e) {
+        if (e) { e.preventDefault(); e.stopPropagation(); if (e.stopImmediatePropagation) e.stopImmediatePropagation(); }
+        var msg = el('messageText') ? el('messageText').value.trim() : '';
+        if (el('winkAssistPanel')) el('winkAssistPanel').classList.add('is-visible');
+        if (!msg) { if (el('winkAssistResult')) el('winkAssistResult').textContent = 'Tulis pesan terlebih dahulu, lalu klik WinkAssist untuk mendapatkan rekomendasi.'; status('Tulis pesan dulu sebelum memakai WinkAssist.', 'error'); return false; }
+        if (el('winkAssistResult')) el('winkAssistResult').textContent = 'Menganalisis dan merapikan pesan...';
+        status('WinkAssist sedang menyiapkan rekomendasi...', 'default');
+        setTimeout(function () { if (el('winkAssistResult')) el('winkAssistResult').textContent = improve(msg); status('WinkAssist berhasil membuat rekomendasi pesan.', 'success'); }, 350);
+        return false;
+      }
+      function useAi(e) {
+        if (e) { e.preventDefault(); e.stopPropagation(); if (e.stopImmediatePropagation) e.stopImmediatePropagation(); }
+        var text = el('winkAssistResult') ? el('winkAssistResult').textContent.trim() : '';
+        if (!text || text.indexOf('Tulis pesan') >= 0 || text.indexOf('Menganalisis') >= 0) { status('Belum ada rekomendasi pesan yang bisa digunakan.', 'error'); return false; }
+        if (el('messageText')) el('messageText').value = text;
+        if (el('winkAssistPanel')) el('winkAssistPanel').classList.remove('is-visible');
+        status('Pesan dari WinkAssist sudah digunakan.', 'success');
+        return false;
+      }
+      function copy(id) {
+        var link = readLink(id);
+        if (!link || link === '#' || link === '-' || link.indexOf('Belum') >= 0) { status('Belum ada link yang bisa disalin.', 'error'); return; }
+        if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(link).then(function(){ status('Link berhasil disalin.', 'success'); }).catch(function(){ window.prompt('Copy link ini:', link); });
+        else window.prompt('Copy link ini:', link);
+      }
+      function openL(id) {
+        var link = readLink(id);
+        if (!link || link === '#' || link === '-' || link.indexOf('Belum') >= 0) { status('Belum ada link yang bisa dibuka.', 'error'); return; }
+        var w = window.open(link, '_blank');
+        if (!w) window.location.href = link;
+      }
+      function syncMessageToggle() {
+        var btn = el('messageToggleBtn');
+        var textarea = el('messageText');
+        var aiBtn = el('winkAssistBtn');
+        var note = el('messageDisabledNote');
+        if (!btn || !textarea) return;
+
+        var enabled = btn.getAttribute('aria-pressed') !== 'false';
+        textarea.disabled = !enabled;
+        textarea.required = enabled;
+        textarea.style.opacity = enabled ? '1' : '0.48';
+        textarea.placeholder = enabled ? 'Halo, saya ingin bertanya tentang promo...' : 'Pesan otomatis nonaktif';
+        btn.textContent = enabled ? 'Pesan ON' : 'Pesan OFF';
+        btn.classList.toggle('is-off', !enabled);
+        if (aiBtn) aiBtn.disabled = !enabled;
+        if (note) note.classList.toggle('is-visible', !enabled);
+        if (!enabled && el('winkAssistPanel')) el('winkAssistPanel').classList.remove('is-visible');
+      }
+
+      function toggleMessage(e) {
+        if (e) { e.preventDefault(); e.stopPropagation(); }
+        var btn = el('messageToggleBtn');
+        if (!btn) return;
+        var enabled = btn.getAttribute('aria-pressed') !== 'false';
+        btn.setAttribute('aria-pressed', enabled ? 'false' : 'true');
+        syncMessageToggle();
+        status(enabled ? 'Pesan otomatis dinonaktifkan.' : 'Pesan otomatis diaktifkan.', 'success');
+      }
+
+      function bind() {
+        var form = el('waForm');
+        if (form) { form.setAttribute('action', 'javascript:void(0)'); form.addEventListener('submit', generate, true); }
+        var gen = form ? form.querySelector('button[type="submit"]') : null;
+        if (gen) gen.addEventListener('click', generate, true);
+        if (el('messageToggleBtn')) el('messageToggleBtn').addEventListener('click', toggleMessage, true);
+        syncMessageToggle();
+        if (el('winkAssistBtn')) el('winkAssistBtn').addEventListener('click', ai, true);
+        if (el('refreshAiTextBtn')) el('refreshAiTextBtn').addEventListener('click', ai, true);
+        if (el('useAiTextBtn')) el('useAiTextBtn').addEventListener('click', useAi, true);
+        if (el('closeAiPanelBtn')) el('closeAiPanelBtn').addEventListener('click', function(e){ e.preventDefault(); if (el('winkAssistPanel')) el('winkAssistPanel').classList.remove('is-visible'); }, true);
+        document.querySelectorAll('.copy-btn').forEach(function(b){ b.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); copy(b.getAttribute('data-copy')); }, true); });
+        document.querySelectorAll('.open-btn').forEach(function(b){ b.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); openL(b.getAttribute('data-open')); }, true); });
+      }
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind); else bind();
+    })();
+  </script>
+<script>
+  /* ===== WinkBox Eye Blink Force Patch ===== */
+  const blinkStyle = document.createElement('style');
+  blinkStyle.innerHTML = `
+    .brand-mark::after {
+      animation: winkboxRealBlink 4.2s infinite !important;
+      transform-origin: center !important;
+    }
+
+    .robot-body::before {
+      animation: mascotRealBlink 4.8s infinite !important;
+      transform-origin: center !important;
+    }
+
+    @keyframes winkboxRealBlink {
+      0%, 45%, 100% {
+        transform: translateX(-6px) scaleY(1);
+      }
+      48%, 52% {
+        transform: translateX(-6px) scaleY(0.08);
+      }
+    }
+
+    @keyframes mascotRealBlink {
+      0%, 45%, 100% {
+        transform: translateX(-10px) scaleY(1);
+      }
+      48%, 52% {
+        transform: translateX(-10px) scaleY(0.08);
+      }
+    }
+  `;
+  document.head.appendChild(blinkStyle);
+
+  /* ===== Disable Right Click ===== */
+  document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+
+    const existing = document.querySelector('.winkbox-rightclick-toast');
+    if (existing) existing.remove();
+
+    const toast = document.createElement('div');
+    toast.className = 'winkbox-rightclick-toast';
+    toast.innerText = 'Ups Ga Boleh Klik Kanan Ya, Heheh 😄';
+
+    toast.style.position = 'fixed';
+    toast.style.left = '50%';
+    toast.style.bottom = '32px';
+    toast.style.transform = 'translateX(-50%)';
+    toast.style.padding = '14px 22px';
+    toast.style.borderRadius = '999px';
+    toast.style.background = 'rgba(8,18,12,0.94)';
+    toast.style.border = '1px solid rgba(167,255,191,0.22)';
+    toast.style.color = '#b8ffd2';
+    toast.style.fontWeight = '600';
+    toast.style.fontSize = '14px';
+    toast.style.zIndex = '999999';
+    toast.style.boxShadow = '0 10px 30px rgba(54,226,154,0.25)';
+    toast.style.backdropFilter = 'blur(12px)';
+    toast.style.opacity = '0';
+    toast.style.transition = 'all .28s ease';
+
+    document.body.appendChild(toast);
+
+    requestAnimationFrame(() => {
+      toast.style.opacity = '1';
+      toast.style.bottom = '42px';
+    });
+
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.bottom = '20px';
+
+      setTimeout(() => {
+        toast.remove();
+      }, 300);
+    }, 2200);
+  });
+</script>
+<script>
+  /* ===== WinkBox Eyes Blink Animation - Final Override ===== */
+  (function () {
+    const existing = document.getElementById('winkboxBlinkFinalStyle');
+    if (existing) existing.remove();
+
+    const winkBlinkStyle = document.createElement('style');
+    winkBlinkStyle.id = 'winkboxBlinkFinalStyle';
+
+    winkBlinkStyle.innerHTML = `
+      .brand-mark::after {
+        animation: winkboxEyesBlinkFinal 4.2s ease-in-out infinite !important;
+        transform-origin: center center !important;
+      }
+
+      @keyframes winkboxEyesBlinkFinal {
+        0%, 44%, 100% {
+          transform: translateX(-6px) scaleY(1) !important;
+        }
+
+        46%, 50% {
+          transform: translateX(-6px) scaleY(0.08) !important;
+        }
+
+        52%, 56% {
+          transform: translateX(-6px) scaleY(1) !important;
+        }
+      }
+
+      .robot-body::before {
+        animation: mascotEyesBlinkFinal 4.8s ease-in-out infinite !important;
+        transform-origin: center center !important;
+      }
+
+      @keyframes mascotEyesBlinkFinal {
+        0%, 44%, 100% {
+          transform: translateX(-10px) scaleY(1) !important;
+        }
+
+        46%, 50% {
+          transform: translateX(-10px) scaleY(0.08) !important;
+        }
+
+        52%, 56% {
+          transform: translateX(-10px) scaleY(1) !important;
+        }
+      }
+    `;
+
+    document.head.appendChild(winkBlinkStyle);
+  })();
+</script>
+</body>
+</html>
