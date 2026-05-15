@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WinkBox - WhatsApp Link & QR Generator</title>
+  <title>WinkBox - WhatsApp Link Generator + QR Code</title>
   <link rel="icon" type="image/png" href="favicon.png">
 <script>
   document.onkeydown = function(e) {
@@ -2903,6 +2903,7 @@ header .brand-mark::after {
           <span class="brand-mark"><span class="robot-eye eye-left"></span><span class="robot-eye eye-right"></span></span></span>
           <span class="brand-name">WinkBox</span>
         </div>
+<button class="mobile-menu-toggle" id="mobileMenuToggle" type="button" aria-label="Buka menu" aria-expanded="false"><span></span><span></span><span></span></button>
         <div class="title-wrap">
           <h1 class="title">
             <span class="title-static">Create <span class="gradient-text">Link WA</span> yang</span>
@@ -5365,6 +5366,313 @@ h1.hero-title,
   display: none !important;
 }
 
+
+/* ===== FOOTER MADE WITH LOVE TYPOGRAPHY FIX ===== */
+.made-with,
+.footer-credit,
+.credit-text,
+.footer-made {
+  font-family: "Clash Display", sans-serif !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.02em !important;
+  color: rgba(236,255,241,0.82) !important;
+  text-decoration: none !important;
+}
+
+.made-with a,
+.footer-credit a,
+.credit-text a,
+.footer-made a {
+  color: #cffff0 !important;
+  text-decoration: none !important;
+  border-bottom: none !important;
+  transition: opacity 0.2s ease !important;
+}
+
+.made-with a:hover,
+.footer-credit a:hover,
+.credit-text a:hover,
+.footer-made a:hover {
+  opacity: 0.82 !important;
+  text-decoration: none !important;
+}
+
+
+/* ===== MOBILE HAMBURGER NAV PATCH ===== */
+.mobile-menu-toggle {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-menu-toggle {
+    position: absolute !important;
+    right: 18px !important;
+    top: 18px !important;
+    z-index: 120 !important;
+    display: inline-flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 5px !important;
+    width: 46px !important;
+    height: 46px !important;
+    border-radius: 16px !important;
+    border: 1px solid rgba(167,255,191,0.32) !important;
+    background: rgba(167,255,191,0.085) !important;
+    box-shadow:
+      0 0 18px rgba(54,226,154,0.36),
+      inset 0 1px 0 rgba(255,255,255,0.10) !important;
+    padding: 0 !important;
+    animation: mobileMenuGlow 2.2s ease-in-out infinite !important;
+  }
+
+  .mobile-menu-toggle span {
+    width: 20px !important;
+    height: 2px !important;
+    border-radius: 999px !important;
+    background: #a7ffbf !important;
+    box-shadow: 0 0 8px rgba(167,255,191,0.9) !important;
+    transition: transform 0.22s ease, opacity 0.22s ease !important;
+  }
+
+  .mobile-menu-toggle.is-open span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg) !important;
+  }
+
+  .mobile-menu-toggle.is-open span:nth-child(2) {
+    opacity: 0 !important;
+  }
+
+  .mobile-menu-toggle.is-open span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg) !important;
+  }
+
+  @keyframes mobileMenuGlow {
+    0%, 100% {
+      box-shadow:
+        0 0 14px rgba(54,226,154,0.26),
+        inset 0 1px 0 rgba(255,255,255,0.10);
+    }
+    50% {
+      box-shadow:
+        0 0 26px rgba(54,226,154,0.56),
+        0 0 44px rgba(167,255,191,0.18),
+        inset 0 1px 0 rgba(255,255,255,0.14);
+    }
+  }
+
+  /* Nav container dibuat compact di mobile */
+  .top-nav,
+  .navbar,
+  .site-nav,
+  .main-nav,
+  header nav,
+  header .nav,
+  header {
+    position: relative !important;
+  }
+
+  /* Menu buttons disembunyikan dulu di mobile */
+  .nav-menu,
+  .nav-links,
+  .menu-links,
+  .top-menu,
+  .navbar-menu,
+  .site-menu,
+  .main-menu {
+    display: none !important;
+  }
+
+  /* Kalau struktur menu tidak pakai wrapper khusus, target tombol navigasi di area header */
+  header [data-page-target],
+  header [data-popup-target],
+  nav [data-page-target],
+  nav [data-popup-target] {
+    display: none !important;
+  }
+
+  body.mobile-menu-open header [data-page-target],
+  body.mobile-menu-open header [data-popup-target],
+  body.mobile-menu-open nav [data-page-target],
+  body.mobile-menu-open nav [data-popup-target] {
+    display: inline-flex !important;
+  }
+
+  body.mobile-menu-open .nav-menu,
+  body.mobile-menu-open .nav-links,
+  body.mobile-menu-open .menu-links,
+  body.mobile-menu-open .top-menu,
+  body.mobile-menu-open .navbar-menu,
+  body.mobile-menu-open .site-menu,
+  body.mobile-menu-open .main-menu {
+    display: grid !important;
+  }
+
+  /* Popup dropdown menu muncul di area tombol hamburger */
+  body.mobile-menu-open header nav,
+  body.mobile-menu-open header .nav,
+  body.mobile-menu-open .top-nav,
+  body.mobile-menu-open .navbar,
+  body.mobile-menu-open .site-nav,
+  body.mobile-menu-open .main-nav {
+    overflow: visible !important;
+  }
+
+  body.mobile-menu-open .nav-menu,
+  body.mobile-menu-open .nav-links,
+  body.mobile-menu-open .menu-links,
+  body.mobile-menu-open .top-menu,
+  body.mobile-menu-open .navbar-menu,
+  body.mobile-menu-open .site-menu,
+  body.mobile-menu-open .main-menu,
+  body.mobile-menu-open header nav > div:not(:first-child),
+  body.mobile-menu-open nav > div:not(:first-child) {
+    position: absolute !important;
+    right: 14px !important;
+    top: 72px !important;
+    z-index: 115 !important;
+    width: min(260px, calc(100vw - 34px)) !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+    padding: 14px !important;
+    border-radius: 24px !important;
+    border: 1px solid rgba(167,255,191,0.18) !important;
+    background: rgba(7,17,12,0.94) !important;
+    backdrop-filter: blur(18px) !important;
+    box-shadow: 0 18px 50px rgba(0,0,0,0.38), 0 0 22px rgba(54,226,154,0.16) !important;
+    animation: mobileMenuDrop 0.24s ease both !important;
+  }
+
+  body.mobile-menu-open header [data-page-target],
+  body.mobile-menu-open header [data-popup-target],
+  body.mobile-menu-open nav [data-page-target],
+  body.mobile-menu-open nav [data-popup-target] {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 13px 14px !important;
+    border-radius: 16px !important;
+    text-align: center !important;
+  }
+
+  @keyframes mobileMenuDrop {
+    from {
+      opacity: 0;
+      transform: translateY(-8px) scale(0.96);
+      filter: blur(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+    }
+  }
+}
+
+
+/* ===== MOBILE HAMBURGER INSIDE BAR FINAL FIX ===== */
+@media (max-width: 768px) {
+  header,
+  nav,
+  .top-nav,
+  .navbar,
+  .site-nav,
+  .main-nav {
+    overflow: visible !important;
+  }
+
+  .top-nav,
+  .navbar,
+  .site-nav,
+  .main-nav,
+  header nav,
+  header .nav {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 74px !important;
+    padding: 12px 72px 12px 16px !important;
+    border-radius: 26px !important;
+  }
+
+  #mobileMenuToggle.mobile-menu-toggle {
+    position: absolute !important;
+    right: 16px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 999 !important;
+    display: inline-flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 5px !important;
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    min-height: 42px !important;
+    border-radius: 15px !important;
+    border: 1px solid rgba(167,255,191,0.32) !important;
+    background: rgba(13, 31, 22, 0.92) !important;
+    box-shadow:
+      0 0 18px rgba(54,226,154,0.42),
+      inset 0 1px 0 rgba(255,255,255,0.12) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    animation: mobileMenuGlow 2.2s ease-in-out infinite !important;
+  }
+
+  #mobileMenuToggle.mobile-menu-toggle span {
+    display: block !important;
+    width: 19px !important;
+    height: 2px !important;
+    border-radius: 999px !important;
+    background: #a7ffbf !important;
+    box-shadow: 0 0 8px rgba(167,255,191,0.92) !important;
+  }
+
+  #mobileMenuToggle.mobile-menu-toggle.is-open span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg) !important;
+  }
+
+  #mobileMenuToggle.mobile-menu-toggle.is-open span:nth-child(2) {
+    opacity: 0 !important;
+  }
+
+  #mobileMenuToggle.mobile-menu-toggle.is-open span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg) !important;
+  }
+
+  /* Keep brand centered with space for hamburger */
+  .top-nav .nav-brand,
+  .navbar .nav-brand,
+  .site-nav .nav-brand,
+  .main-nav .nav-brand,
+  header .nav-brand,
+  nav .nav-brand,
+  header a:first-child,
+  nav a:first-child {
+    margin-inline: auto !important;
+  }
+
+  /* Dropdown opens under the same mobile bar */
+  body.mobile-menu-open .nav-menu,
+  body.mobile-menu-open .nav-links,
+  body.mobile-menu-open .menu-links,
+  body.mobile-menu-open .top-menu,
+  body.mobile-menu-open .navbar-menu,
+  body.mobile-menu-open .site-menu,
+  body.mobile-menu-open .main-menu,
+  body.mobile-menu-open header nav > div:not(:first-child),
+  body.mobile-menu-open nav > div:not(:first-child) {
+    right: 16px !important;
+    top: calc(100% + 10px) !important;
+    z-index: 998 !important;
+  }
+}
+
 </style>
 <script id="winkbox-stability-final-patch">
   (function () {
@@ -5669,6 +5977,124 @@ h1.hero-title,
   /* Re-apply after generate/reset changes, just in case any old script mutates button state */
   document.addEventListener("click", function() {
     setTimeout(applyFixes, 50);
+  }, true);
+})();
+</script>
+
+
+<!-- ===== MOBILE HAMBURGER NAV PATCH ===== -->
+<script>
+(function () {
+  function initMobileMenu() {
+    var toggle = document.getElementById("mobileMenuToggle");
+    if (!toggle) return;
+
+    toggle.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      var isOpen = document.body.classList.toggle("mobile-menu-open");
+      toggle.classList.toggle("is-open", isOpen);
+      toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    }, true);
+
+    document.querySelectorAll("[data-page-target], [data-popup-target]").forEach(function (item) {
+      item.addEventListener("click", function () {
+        document.body.classList.remove("mobile-menu-open");
+        toggle.classList.remove("is-open");
+        toggle.setAttribute("aria-expanded", "false");
+      }, true);
+    });
+
+    document.addEventListener("click", function (e) {
+      if (!document.body.classList.contains("mobile-menu-open")) return;
+      var header = document.querySelector("header, nav, .top-nav, .navbar, .site-nav, .main-nav");
+      if (header && header.contains(e.target)) return;
+      document.body.classList.remove("mobile-menu-open");
+      toggle.classList.remove("is-open");
+      toggle.setAttribute("aria-expanded", "false");
+    }, true);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initMobileMenu);
+  } else {
+    initMobileMenu();
+  }
+})();
+</script>
+
+
+<!-- ===== MOBILE HAMBURGER REPOSITION FINAL FIX ===== -->
+<script>
+(function () {
+  function getBestNav() {
+    return document.querySelector(".top-nav, .navbar, .site-nav, .main-nav, header nav, header .nav, nav, header");
+  }
+
+  function ensureMobileToggleInsideBar() {
+    var toggle = document.getElementById("mobileMenuToggle");
+    var nav = getBestNav();
+
+    if (!nav) return;
+
+    if (!toggle) {
+      toggle = document.createElement("button");
+      toggle.className = "mobile-menu-toggle";
+      toggle.id = "mobileMenuToggle";
+      toggle.type = "button";
+      toggle.setAttribute("aria-label", "Buka menu");
+      toggle.setAttribute("aria-expanded", "false");
+      toggle.innerHTML = "<span></span><span></span><span></span>";
+    }
+
+    if (toggle.parentElement !== nav) {
+      nav.appendChild(toggle);
+    }
+
+    toggle.style.display = "";
+    toggle.style.visibility = "";
+    toggle.style.opacity = "";
+  }
+
+  function bindToggleOnce() {
+    ensureMobileToggleInsideBar();
+
+    var toggle = document.getElementById("mobileMenuToggle");
+    if (!toggle || toggle.dataset.boundInsideBar === "true") return;
+
+    toggle.dataset.boundInsideBar = "true";
+
+    toggle.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+
+      var isOpen = document.body.classList.toggle("mobile-menu-open");
+      toggle.classList.toggle("is-open", isOpen);
+      toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      return false;
+    }, true);
+  }
+
+  function refreshMobileMenu() {
+    ensureMobileToggleInsideBar();
+    bindToggleOnce();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", refreshMobileMenu);
+  } else {
+    refreshMobileMenu();
+  }
+
+  window.addEventListener("resize", refreshMobileMenu);
+  window.addEventListener("hashchange", function () {
+    setTimeout(refreshMobileMenu, 60);
+  });
+
+  document.addEventListener("click", function () {
+    setTimeout(refreshMobileMenu, 80);
   }, true);
 })();
 </script>
