@@ -5673,6 +5673,79 @@ h1.hero-title,
   }
 }
 
+
+/* ===== MOBILE NAV CLICKABLE + LEFT LOGO FINAL FIX ===== */
+@media (max-width: 768px) {
+  .top-nav,
+  .navbar,
+  .site-nav,
+  .main-nav,
+  header nav,
+  header .nav,
+  nav,
+  header {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    min-height: 72px !important;
+    padding: 12px 14px !important;
+    overflow: visible !important;
+  }
+
+  /* Brand/logo WinkBox di kiri */
+  .top-nav .nav-brand,
+  .navbar .nav-brand,
+  .site-nav .nav-brand,
+  .main-nav .nav-brand,
+  header .nav-brand,
+  nav .nav-brand,
+  header a:first-child,
+  nav a:first-child {
+    margin: 0 !important;
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    transform: none !important;
+    z-index: 1000 !important;
+    flex: 0 0 auto !important;
+  }
+
+  #mobileMenuToggle.mobile-menu-toggle {
+    position: relative !important;
+    right: auto !important;
+    top: auto !important;
+    transform: none !important;
+    z-index: 1200 !important;
+    display: inline-flex !important;
+    flex: 0 0 auto !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    touch-action: manipulation !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+  }
+
+  #mobileMenuToggle.mobile-menu-toggle * {
+    pointer-events: none !important;
+  }
+
+  body.mobile-menu-open .nav-menu,
+  body.mobile-menu-open .nav-links,
+  body.mobile-menu-open .menu-links,
+  body.mobile-menu-open .top-menu,
+  body.mobile-menu-open .navbar-menu,
+  body.mobile-menu-open .site-menu,
+  body.mobile-menu-open .main-menu,
+  body.mobile-menu-open header nav > div:not(:first-child),
+  body.mobile-menu-open nav > div:not(:first-child) {
+    right: 14px !important;
+    top: calc(100% + 10px) !important;
+    left: auto !important;
+    z-index: 1190 !important;
+  }
+}
+
 </style>
 <script id="winkbox-stability-final-patch">
   (function () {
@@ -6096,6 +6169,99 @@ h1.hero-title,
   document.addEventListener("click", function () {
     setTimeout(refreshMobileMenu, 80);
   }, true);
+})();
+</script>
+
+
+<!-- ===== MOBILE NAV CLICKABLE + LEFT LOGO FINAL FIX ===== -->
+<script>
+(function () {
+  function getNav() {
+    return document.querySelector(".top-nav, .navbar, .site-nav, .main-nav, header nav, header .nav, nav, header");
+  }
+
+  function ensureToggle() {
+    var nav = getNav();
+    if (!nav) return null;
+
+    var toggle = document.getElementById("mobileMenuToggle");
+
+    if (!toggle) {
+      toggle = document.createElement("button");
+      toggle.id = "mobileMenuToggle";
+      toggle.className = "mobile-menu-toggle";
+      toggle.type = "button";
+      toggle.setAttribute("aria-label", "Buka menu");
+      toggle.setAttribute("aria-expanded", "false");
+      toggle.innerHTML = "<span></span><span></span><span></span>";
+    }
+
+    if (toggle.parentElement !== nav) {
+      nav.appendChild(toggle);
+    }
+
+    return toggle;
+  }
+
+  function closeMenu(toggle) {
+    document.body.classList.remove("mobile-menu-open");
+    if (toggle) {
+      toggle.classList.remove("is-open");
+      toggle.setAttribute("aria-expanded", "false");
+    }
+  }
+
+  function openClose(toggle) {
+    var isOpen = document.body.classList.toggle("mobile-menu-open");
+    toggle.classList.toggle("is-open", isOpen);
+    toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  }
+
+  function bind() {
+    var toggle = ensureToggle();
+    if (!toggle || toggle.dataset.mobileClickableFixed === "true") return;
+
+    toggle.dataset.mobileClickableFixed = "true";
+
+    ["click", "touchend"].forEach(function (eventName) {
+      toggle.addEventListener(eventName, function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+        openClose(toggle);
+        return false;
+      }, true);
+    });
+
+    document.querySelectorAll("[data-page-target], [data-popup-target]").forEach(function (item) {
+      item.addEventListener("click", function () {
+        closeMenu(toggle);
+      }, true);
+    });
+
+    document.addEventListener("click", function (e) {
+      if (!document.body.classList.contains("mobile-menu-open")) return;
+      var nav = getNav();
+      if (nav && nav.contains(e.target)) return;
+      closeMenu(toggle);
+    }, true);
+  }
+
+  function init() {
+    ensureToggle();
+    bind();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+
+  window.addEventListener("resize", init);
+  window.addEventListener("hashchange", function () {
+    setTimeout(init, 80);
+  });
 })();
 </script>
 
