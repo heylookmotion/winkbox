@@ -5,7 +5,59 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>WinkBox - WhatsApp Link Generator + QR Code</title>
   <link rel="icon" type="image/png" href="favicon.png">
+<script>
+  document.onkeydown = function(e) {
+    if (e.keyCode == 123) {
+      return false;
+    }
 
+    if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) {
+      return false;
+    }
+
+    if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) {
+      return false;
+    }
+
+    if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) {
+      return false;
+    }
+
+    if (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) {
+      return false;
+    }
+
+    if (e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) {
+      return false;
+    }
+  };
+</script>
+
+  <script>
+  document.onkeydown = function(e) {
+    const modifier = e.ctrlKey || e.metaKey;
+
+    if (e.keyCode == 123) {
+      return false;
+    }
+
+    if (modifier && e.keyCode == 'U'.charCodeAt(0)) {
+      return false;
+    }
+
+    if (modifier && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) {
+      return false;
+    }
+
+    if (modifier && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) {
+      return false;
+    }
+
+    if (modifier && e.keyCode == 'S'.charCodeAt(0)) {
+      return false;
+    }
+  };
+</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
