@@ -5746,6 +5746,52 @@ h1.hero-title,
   }
 }
 
+
+/* ===== FORCE CLICKABLE MOBILE HAMBURGER FIX ===== */
+@media (max-width: 768px) {
+  #mobileMenuToggle {
+    position: relative !important;
+    z-index: 99999 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+
+  #mobileMenuToggle,
+  #mobileMenuToggle span {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+  }
+
+  #mobileMenuToggle span {
+    pointer-events: none !important;
+  }
+
+  /* cegah elemen menu/brand nutup area klik hamburger */
+  .top-nav > *:not(#mobileMenuToggle),
+  .navbar > *:not(#mobileMenuToggle),
+  .site-nav > *:not(#mobileMenuToggle),
+  .main-nav > *:not(#mobileMenuToggle),
+  header nav > *:not(#mobileMenuToggle),
+  nav > *:not(#mobileMenuToggle) {
+    z-index: 5 !important;
+  }
+
+  .top-nav #mobileMenuToggle,
+  .navbar #mobileMenuToggle,
+  .site-nav #mobileMenuToggle,
+  .main-nav #mobileMenuToggle,
+  header nav #mobileMenuToggle,
+  nav #mobileMenuToggle {
+    z-index: 99999 !important;
+  }
+
+  body.mobile-menu-open #mobileMenuToggle {
+    z-index: 100000 !important;
+  }
+}
+
 </style>
 <script id="winkbox-stability-final-patch">
   (function () {
@@ -6261,6 +6307,105 @@ h1.hero-title,
   window.addEventListener("resize", init);
   window.addEventListener("hashchange", function () {
     setTimeout(init, 80);
+  });
+})();
+</script>
+
+
+<!-- ===== FORCE CLICKABLE MOBILE HAMBURGER FIX ===== -->
+<script>
+(function () {
+  function navRoot() {
+    return document.querySelector(".top-nav, .navbar, .site-nav, .main-nav, header nav, nav, header");
+  }
+
+  function makeToggle() {
+    var nav = navRoot();
+    if (!nav) return null;
+
+    var old = document.getElementById("mobileMenuToggle");
+    var btn = document.createElement("button");
+
+    btn.id = "mobileMenuToggle";
+    btn.className = "mobile-menu-toggle";
+    btn.type = "button";
+    btn.setAttribute("aria-label", "Buka menu");
+    btn.setAttribute("aria-expanded", document.body.classList.contains("mobile-menu-open") ? "true" : "false");
+    btn.innerHTML = "<span></span><span></span><span></span>";
+
+    if (document.body.classList.contains("mobile-menu-open")) {
+      btn.classList.add("is-open");
+    }
+
+    if (old) old.remove();
+    nav.appendChild(btn);
+
+    return btn;
+  }
+
+  function toggleMenu(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+    }
+
+    var btn = document.getElementById("mobileMenuToggle");
+    var isOpen = !document.body.classList.contains("mobile-menu-open");
+
+    document.body.classList.toggle("mobile-menu-open", isOpen);
+
+    if (btn) {
+      btn.classList.toggle("is-open", isOpen);
+      btn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    }
+
+    return false;
+  }
+
+  function bind() {
+    var btn = makeToggle();
+    if (!btn) return;
+
+    btn.onclick = toggleMenu;
+    btn.onpointerdown = toggleMenu;
+    btn.ontouchstart = toggleMenu;
+
+    ["click", "pointerdown", "touchstart"].forEach(function (type) {
+      btn.addEventListener(type, toggleMenu, true);
+      btn.addEventListener(type, toggleMenu, false);
+    });
+
+    document.querySelectorAll("[data-page-target], [data-popup-target]").forEach(function (item) {
+      if (item.dataset.closeMobileBound === "true") return;
+      item.dataset.closeMobileBound = "true";
+      item.addEventListener("click", function () {
+        var btn = document.getElementById("mobileMenuToggle");
+        document.body.classList.remove("mobile-menu-open");
+        if (btn) {
+          btn.classList.remove("is-open");
+          btn.setAttribute("aria-expanded", "false");
+        }
+      }, true);
+    });
+  }
+
+  function init() {
+    bind();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+
+  window.addEventListener("resize", function () {
+    setTimeout(init, 60);
+  });
+
+  window.addEventListener("hashchange", function () {
+    setTimeout(init, 60);
   });
 })();
 </script>
