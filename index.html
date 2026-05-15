@@ -2903,7 +2903,7 @@ header .brand-mark::after {
           <span class="brand-mark"><span class="robot-eye eye-left"></span><span class="robot-eye eye-right"></span></span></span>
           <span class="brand-name">WinkBox</span>
         </div>
-<button class="mobile-menu-toggle" id="mobileMenuToggle" type="button" aria-label="Buka menu" aria-expanded="false"><span></span><span></span><span></span></button>
+
         <div class="title-wrap">
           <h1 class="title">
             <span class="title-static">Create <span class="gradient-text">Link WA</span> yang</span>
@@ -5792,6 +5792,360 @@ h1.hero-title,
   }
 }
 
+
+/* ===== CLEAN TOP MENU NO LOGO PATCH ===== */
+
+/* Hapus logo pojok kiri/topbar saja, tidak menyentuh logo hero */
+.top-nav .nav-brand,
+.navbar .nav-brand,
+.site-nav .nav-brand,
+.main-nav .nav-brand,
+header .nav-brand,
+nav .nav-brand,
+header a:first-child:has(.brand-mark),
+nav a:first-child:has(.brand-mark) {
+  display: none !important;
+}
+
+/* Mobile: menu jadi satu baris, clean, tanpa kotak besar/rounded wrapper */
+@media (max-width: 768px) {
+  #mobileMenuToggle,
+  .mobile-menu-toggle {
+    display: none !important;
+  }
+
+  body {
+    --mobile-menu-gap: clamp(10px, 3vw, 18px);
+  }
+
+  .top-nav,
+  .navbar,
+  .site-nav,
+  .main-nav,
+  header nav,
+  header .nav,
+  nav,
+  header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: auto !important;
+    width: 100% !important;
+    padding: 10px 6px !important;
+    margin: 0 auto 18px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    overflow: visible !important;
+  }
+
+  .nav-menu,
+  .nav-links,
+  .menu-links,
+  .top-menu,
+  .navbar-menu,
+  .site-menu,
+  .main-menu {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-wrap: nowrap !important;
+    gap: var(--mobile-menu-gap) !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    position: static !important;
+  }
+
+  header [data-page-target],
+  header [data-popup-target],
+  nav [data-page-target],
+  nav [data-popup-target],
+  .nav-menu [data-page-target],
+  .nav-menu [data-popup-target],
+  .nav-links [data-page-target],
+  .nav-links [data-popup-target],
+  .menu-links [data-page-target],
+  .menu-links [data-popup-target],
+  .top-menu [data-page-target],
+  .top-menu [data-popup-target] {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 auto !important;
+    white-space: nowrap !important;
+    min-width: auto !important;
+    width: auto !important;
+    padding: 8px 10px !important;
+    border-radius: 999px !important;
+    font-size: clamp(10px, 2.6vw, 12px) !important;
+    line-height: 1 !important;
+    letter-spacing: -0.01em !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+
+  header [data-page-target]:not(.is-active),
+  header [data-popup-target]:not(.is-active),
+  nav [data-page-target]:not(.is-active),
+  nav [data-popup-target]:not(.is-active) {
+    background: transparent !important;
+  }
+
+  /* Jaga supaya menu tidak turun jadi dua baris */
+  .page,
+  main,
+  .hero,
+  .hero-copy {
+    overflow-x: visible !important;
+  }
+}
+
+@media (max-width: 390px) {
+  header [data-page-target],
+  header [data-popup-target],
+  nav [data-page-target],
+  nav [data-popup-target] {
+    padding: 7px 7px !important;
+    font-size: 10px !important;
+  }
+
+  .nav-menu,
+  .nav-links,
+  .menu-links,
+  .top-menu,
+  .navbar-menu,
+  .site-menu,
+  .main-menu {
+    gap: 6px !important;
+  }
+}
+
+
+/* ===== REMOVE OUTER MENU BOX + CENTER MENU ===== */
+
+/* Hapus kotak luar/wrapper menu */
+.top-nav,
+.navbar,
+.site-nav,
+.main-nav,
+header nav,
+header .nav,
+nav,
+header {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Menu benar-benar center */
+.nav-menu,
+.nav-links,
+.menu-links,
+.top-menu,
+.navbar-menu,
+.site-menu,
+.main-menu {
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Wrapper parent center */
+.top-nav,
+.navbar,
+.site-nav,
+.main-nav,
+header nav,
+header .nav {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+/* Mobile spacing lebih compact */
+@media (max-width: 768px) {
+  .nav-menu,
+  .nav-links,
+  .menu-links,
+  .top-menu,
+  .navbar-menu,
+  .site-menu,
+  .main-menu {
+    gap: 8px !important;
+  }
+}
+
+
+/* ===== STATIC TOP MENU + FULL LINK QR ONLY FIX ===== */
+
+/* Menu tetap di atas, tidak ikut scroll */
+.top-nav,
+.navbar,
+.site-nav,
+.main-nav,
+header nav,
+header .nav,
+nav,
+header {
+  position: static !important;
+  top: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
+}
+
+/* Pastikan tidak ada efek sticky/fixed dari patch lama */
+.top-nav.is-sticky,
+.navbar.is-sticky,
+.site-nav.is-sticky,
+.main-nav.is-sticky,
+header.is-sticky,
+nav.is-sticky {
+  position: static !important;
+}
+
+/* Jika QR shortlink disembunyikan, grid otomatis jadi satu kolom yang center */
+.qr-grid:has(#shortQrWrap.is-hidden) {
+  grid-template-columns: minmax(0, 1fr) !important;
+  justify-items: center !important;
+}
+
+.qr-grid:has(#shortQrWrap.is-hidden) #fullQrWrap {
+  width: min(560px, 100%) !important;
+}
+
+
+/* ===== FORCE HIDE SHORT QR WHEN FULL MODE + DOWNLOAD/LOGO FIX ===== */
+body.wb-full-mode #shortLinkBox,
+body.wb-full-mode #shortQrWrap {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+body.wb-full-mode #qrGrid {
+  grid-template-columns: 1fr !important;
+  justify-items: center !important;
+}
+
+body.wb-full-mode #fullQrWrap {
+  width: min(560px, 100%) !important;
+  margin-inline: auto !important;
+}
+
+#fullQrCode,
+#shortQrCode,
+#customQrCode {
+  position: relative !important;
+}
+
+
+/* ===== REMOVE REMAINING HAMBURGER ICON ===== */
+#mobileMenuToggle,
+.mobile-menu-toggle,
+.hamburger,
+.menu-toggle,
+.nav-toggle {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+
+/* ===== FORCE REMOVE ALL HAMBURGER/TRIGGER ICONS ===== */
+#mobileMenuToggle,
+.mobile-menu-toggle,
+.hamburger,
+.menu-toggle,
+.nav-toggle,
+.winkbox-fab,
+.winkbox-fab-trigger,
+[id*="hamburger"],
+[class*="hamburger"],
+[id*="menuToggle"],
+[class*="menu-toggle"],
+button[aria-label*="menu" i],
+button[aria-label*="Menu" i] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+
+
+/* ===== TOTAL MOBILE HAMBURGER REMOVAL FINAL ===== */
+#mobileMenuToggle,
+.mobile-menu-toggle,
+.mobile-menu-toggle *,
+.hamburger,
+.hamburger *,
+.menu-toggle,
+.menu-toggle *,
+.nav-toggle,
+.nav-toggle *,
+button.mobile-menu-toggle,
+button.hamburger,
+button.menu-toggle,
+button.nav-toggle,
+button:has(> span:nth-child(3)),
+button[aria-label="Buka menu"],
+button[aria-label*="menu" i],
+button[aria-expanded][aria-label],
+.winkbox-fab,
+.winkbox-fab *,
+.winkbox-fab-trigger,
+.winkbox-fab-trigger * {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: 0 !important;
+  max-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  overflow: hidden !important;
+}
+
+/* Mobile only: pastikan tidak ada floating glowing icon tersisa */
+@media (max-width: 768px) {
+  body::marker,
+  .page > button,
+  main > button,
+  header > button,
+  nav > button {
+    display: none !important;
+  }
+}
+
 </style>
 <script id="winkbox-stability-final-patch">
   (function () {
@@ -6101,312 +6455,356 @@ h1.hero-title,
 </script>
 
 
-<!-- ===== MOBILE HAMBURGER NAV PATCH ===== -->
+<!-- ===== FORCE FULL ONLY QR + TRUE DOWNLOAD + LOGO CANVAS FIX ===== -->
 <script>
 (function () {
-  function initMobileMenu() {
-    var toggle = document.getElementById("mobileMenuToggle");
-    if (!toggle) return;
+  function el(id){ return document.getElementById(id); }
 
-    toggle.addEventListener("click", function (e) {
-      e.preventDefault();
-      e.stopPropagation();
+  function getLink(id) {
+    var node = el(id);
+    if (!node) return "";
+    return node.getAttribute("data-link") || node.href || node.textContent.trim() || "";
+  }
 
-      var isOpen = document.body.classList.toggle("mobile-menu-open");
-      toggle.classList.toggle("is-open", isOpen);
-      toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
-    }, true);
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
 
-    document.querySelectorAll("[data-page-target], [data-popup-target]").forEach(function (item) {
-      item.addEventListener("click", function () {
-        document.body.classList.remove("mobile-menu-open");
-        toggle.classList.remove("is-open");
-        toggle.setAttribute("aria-expanded", "false");
-      }, true);
+  function readFile(file) {
+    return new Promise(function(resolve) {
+      if (!file) return resolve("");
+      var r = new FileReader();
+      r.onload = function(e){ resolve(e.target.result || ""); };
+      r.onerror = function(){ resolve(""); };
+      r.readAsDataURL(file);
     });
-
-    document.addEventListener("click", function (e) {
-      if (!document.body.classList.contains("mobile-menu-open")) return;
-      var header = document.querySelector("header, nav, .top-nav, .navbar, .site-nav, .main-nav");
-      if (header && header.contains(e.target)) return;
-      document.body.classList.remove("mobile-menu-open");
-      toggle.classList.remove("is-open");
-      toggle.setAttribute("aria-expanded", "false");
-    }, true);
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initMobileMenu);
-  } else {
-    initMobileMenu();
-  }
-})();
-</script>
-
-
-<!-- ===== MOBILE HAMBURGER REPOSITION FINAL FIX ===== -->
-<script>
-(function () {
-  function getBestNav() {
-    return document.querySelector(".top-nav, .navbar, .site-nav, .main-nav, header nav, header .nav, nav, header");
+  function getLogoDataFor(boxId) {
+    var input = boxId === "customQrCode" ? el("customQrLogoInput") : el("qrLogoInput");
+    return input && input.files && input.files[0] ? readFile(input.files[0]) : Promise.resolve("");
   }
 
-  function ensureMobileToggleInsideBar() {
-    var toggle = document.getElementById("mobileMenuToggle");
-    var nav = getBestNav();
+  function drawLogoToCanvas(canvas, logoData, previewMode) {
+    if (!canvas || !logoData) return Promise.resolve();
+    return new Promise(function(resolve) {
+      var img = new Image();
+      img.onload = function() {
+        var ctx = canvas.getContext("2d");
+        var size = canvas.width;
+        var logoSize = Math.round(size * 0.20);
+        var pad = Math.round(size * 0.035);
+        var x = Math.round((size - logoSize) / 2);
+        var y = Math.round((size - logoSize) / 2);
 
-    if (!nav) return;
+        ctx.save();
+        ctx.fillStyle = "#ecfff1";
+        roundRect(ctx, x - pad, y - pad, logoSize + pad * 2, logoSize + pad * 2, Math.round(size * 0.035));
+        ctx.fill();
+        ctx.strokeStyle = "rgba(6,18,11,0.16)";
+        ctx.lineWidth = Math.max(1, Math.round(size * 0.008));
+        ctx.stroke();
 
-    if (!toggle) {
-      toggle = document.createElement("button");
-      toggle.className = "mobile-menu-toggle";
-      toggle.id = "mobileMenuToggle";
-      toggle.type = "button";
-      toggle.setAttribute("aria-label", "Buka menu");
-      toggle.setAttribute("aria-expanded", "false");
-      toggle.innerHTML = "<span></span><span></span><span></span>";
+        ctx.beginPath();
+        roundRect(ctx, x, y, logoSize, logoSize, Math.round(size * 0.025));
+        ctx.clip();
+        ctx.drawImage(img, x, y, logoSize, logoSize);
+        ctx.restore();
+        resolve();
+      };
+      img.onerror = function(){ resolve(); };
+      img.src = logoData;
+    });
+  }
+
+  function makeQrCanvas(text, size) {
+    return new Promise(function(resolve) {
+      if (!text || typeof QRCode === "undefined") return resolve(null);
+
+      var temp = document.createElement("div");
+      temp.style.position = "fixed";
+      temp.style.left = "-99999px";
+      temp.style.top = "-99999px";
+      temp.style.width = size + "px";
+      temp.style.height = size + "px";
+      document.body.appendChild(temp);
+
+      new QRCode(temp, {
+        text: text,
+        width: size,
+        height: size,
+        colorDark: "#06120b",
+        colorLight: "#ecfff1",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+
+      setTimeout(function(){
+        var source = temp.querySelector("canvas");
+        var out = document.createElement("canvas");
+        out.width = size;
+        out.height = size;
+        var ctx = out.getContext("2d");
+        ctx.fillStyle = "#ecfff1";
+        ctx.fillRect(0,0,size,size);
+
+        if (source) {
+          ctx.drawImage(source, 0, 0, size, size);
+          temp.remove();
+          resolve(out);
+        } else {
+          var img = temp.querySelector("img");
+          if (!img) {
+            temp.remove();
+            resolve(null);
+          } else {
+            function drawImg() {
+              ctx.drawImage(img, 0, 0, size, size);
+              temp.remove();
+              resolve(out);
+            }
+            if (img.complete) drawImg();
+            else img.onload = drawImg;
+          }
+        }
+      }, 200);
+    });
+  }
+
+  async function renderPreviewWithLogo(boxId, outputId) {
+    var box = el(boxId);
+    if (!box) return;
+    var link = getLink(outputId);
+    if (!link || link === "#" || link === "-" || link.indexOf("Belum") >= 0) return;
+
+    var logoData = await getLogoDataFor(boxId);
+    var canvas = await makeQrCanvas(link, 210);
+    if (!canvas) return;
+    await drawLogoToCanvas(canvas, logoData, true);
+
+    box.innerHTML = "";
+    box.appendChild(canvas);
+  }
+
+  async function downloadHd(boxId) {
+    var map = {
+      fullQrCode: "fullLinkOutput",
+      shortQrCode: "shortLinkOutput",
+      customQrCode: "customQrOutput"
+    };
+    var outputId = map[boxId];
+    var link = getLink(outputId);
+    if (!link || link === "#" || link === "-" || link.indexOf("Belum") >= 0) return;
+
+    var logoData = await getLogoDataFor(boxId);
+    var canvas = await makeQrCanvas(link, 1400);
+    if (!canvas) return;
+    await drawLogoToCanvas(canvas, logoData, false);
+
+    canvas.toBlob(function(blob){
+      if (!blob) return;
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = "winkbox-qr-hd.png";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+    }, "image/png", 1);
+  }
+
+  function applyModeState() {
+    var mode = el("linkMode");
+    var fullMode = !mode || mode.value === "full";
+    document.body.classList.toggle("wb-full-mode", fullMode);
+
+    if (fullMode) {
+      var shortBox = el("shortLinkBox");
+      var shortWrap = el("shortQrWrap");
+      var shortQr = el("shortQrCode");
+      var shortOut = el("shortLinkOutput");
+
+      if (shortBox) shortBox.classList.add("is-hidden");
+      if (shortWrap) shortWrap.classList.add("is-hidden");
+      if (shortQr) shortQr.innerHTML = "";
+      if (shortOut) {
+        shortOut.textContent = "Belum dibuat";
+        shortOut.href = "#";
+        shortOut.removeAttribute("data-link");
+      }
     }
-
-    if (toggle.parentElement !== nav) {
-      nav.appendChild(toggle);
-    }
-
-    toggle.style.display = "";
-    toggle.style.visibility = "";
-    toggle.style.opacity = "";
   }
 
-  function bindToggleOnce() {
-    ensureMobileToggleInsideBar();
-
-    var toggle = document.getElementById("mobileMenuToggle");
-    if (!toggle || toggle.dataset.boundInsideBar === "true") return;
-
-    toggle.dataset.boundInsideBar = "true";
-
-    toggle.addEventListener("click", function (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
-
-      var isOpen = document.body.classList.toggle("mobile-menu-open");
-      toggle.classList.toggle("is-open", isOpen);
-      toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
-      return false;
-    }, true);
-  }
-
-  function refreshMobileMenu() {
-    ensureMobileToggleInsideBar();
-    bindToggleOnce();
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", refreshMobileMenu);
-  } else {
-    refreshMobileMenu();
-  }
-
-  window.addEventListener("resize", refreshMobileMenu);
-  window.addEventListener("hashchange", function () {
-    setTimeout(refreshMobileMenu, 60);
-  });
-
-  document.addEventListener("click", function () {
-    setTimeout(refreshMobileMenu, 80);
-  }, true);
-})();
-</script>
-
-
-<!-- ===== MOBILE NAV CLICKABLE + LEFT LOGO FINAL FIX ===== -->
-<script>
-(function () {
-  function getNav() {
-    return document.querySelector(".top-nav, .navbar, .site-nav, .main-nav, header nav, header .nav, nav, header");
-  }
-
-  function ensureToggle() {
-    var nav = getNav();
-    if (!nav) return null;
-
-    var toggle = document.getElementById("mobileMenuToggle");
-
-    if (!toggle) {
-      toggle = document.createElement("button");
-      toggle.id = "mobileMenuToggle";
-      toggle.className = "mobile-menu-toggle";
-      toggle.type = "button";
-      toggle.setAttribute("aria-label", "Buka menu");
-      toggle.setAttribute("aria-expanded", "false");
-      toggle.innerHTML = "<span></span><span></span><span></span>";
-    }
-
-    if (toggle.parentElement !== nav) {
-      nav.appendChild(toggle);
-    }
-
-    return toggle;
-  }
-
-  function closeMenu(toggle) {
-    document.body.classList.remove("mobile-menu-open");
-    if (toggle) {
-      toggle.classList.remove("is-open");
-      toggle.setAttribute("aria-expanded", "false");
-    }
-  }
-
-  function openClose(toggle) {
-    var isOpen = document.body.classList.toggle("mobile-menu-open");
-    toggle.classList.toggle("is-open", isOpen);
-    toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  function refreshAfterGenerate() {
+    applyModeState();
+    setTimeout(function(){
+      applyModeState();
+      renderPreviewWithLogo("fullQrCode", "fullLinkOutput");
+      if (!document.body.classList.contains("wb-full-mode")) {
+        renderPreviewWithLogo("shortQrCode", "shortLinkOutput");
+      }
+    }, 450);
+    setTimeout(function(){
+      applyModeState();
+      renderPreviewWithLogo("fullQrCode", "fullLinkOutput");
+      if (!document.body.classList.contains("wb-full-mode")) {
+        renderPreviewWithLogo("shortQrCode", "shortLinkOutput");
+      }
+    }, 950);
   }
 
   function bind() {
-    var toggle = ensureToggle();
-    if (!toggle || toggle.dataset.mobileClickableFixed === "true") return;
+    var mode = el("linkMode");
+    var form = el("waForm");
+    var logo = el("qrLogoInput");
 
-    toggle.dataset.mobileClickableFixed = "true";
+    if (mode && mode.dataset.wbForceBound !== "true") {
+      mode.dataset.wbForceBound = "true";
+      mode.addEventListener("change", refreshAfterGenerate, true);
+    }
 
-    ["click", "touchend"].forEach(function (eventName) {
-      toggle.addEventListener(eventName, function (e) {
+    if (form && form.dataset.wbForceBound !== "true") {
+      form.dataset.wbForceBound = "true";
+      form.addEventListener("submit", refreshAfterGenerate, true);
+    }
+
+    if (logo && logo.dataset.wbLogoBound !== "true") {
+      logo.dataset.wbLogoBound = "true";
+      logo.addEventListener("change", function(){
+        setTimeout(function(){
+          renderPreviewWithLogo("fullQrCode", "fullLinkOutput");
+          if (!document.body.classList.contains("wb-full-mode")) {
+            renderPreviewWithLogo("shortQrCode", "shortLinkOutput");
+          }
+        }, 200);
+      }, true);
+    }
+
+    document.addEventListener("click", function(e){
+      var target = e.target;
+      if (!target) return;
+
+      if (target.closest && target.closest("#waForm button[type='submit'], #waForm .btn-primary")) {
+        refreshAfterGenerate();
+      }
+
+      var dl = target.closest && target.closest("[data-download-qr]");
+      if (dl) {
         e.preventDefault();
         e.stopPropagation();
         if (e.stopImmediatePropagation) e.stopImmediatePropagation();
-        openClose(toggle);
+        downloadHd(dl.getAttribute("data-download-qr"));
         return false;
-      }, true);
-    });
+      }
 
-    document.querySelectorAll("[data-page-target], [data-popup-target]").forEach(function (item) {
-      item.addEventListener("click", function () {
-        closeMenu(toggle);
-      }, true);
-    });
-
-    document.addEventListener("click", function (e) {
-      if (!document.body.classList.contains("mobile-menu-open")) return;
-      var nav = getNav();
-      if (nav && nav.contains(e.target)) return;
-      closeMenu(toggle);
+      if (target.id === "downloadCustomQrBtn") {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+        downloadHd("customQrCode");
+        return false;
+      }
     }, true);
+
+    applyModeState();
   }
 
-  function init() {
-    ensureToggle();
-    bind();
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
-    init();
-  }
-
-  window.addEventListener("resize", init);
-  window.addEventListener("hashchange", function () {
-    setTimeout(init, 80);
-  });
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", bind);
+  else bind();
 })();
 </script>
 
 
-<!-- ===== FORCE CLICKABLE MOBILE HAMBURGER FIX ===== -->
 <script>
-(function () {
-  function navRoot() {
-    return document.querySelector(".top-nav, .navbar, .site-nav, .main-nav, header nav, nav, header");
-  }
+(function(){
+  function nukeHamburger(){
+    var selectors = [
+      '#mobileMenuToggle',
+      '.mobile-menu-toggle',
+      '.hamburger',
+      '.menu-toggle',
+      '.nav-toggle',
+      '.winkbox-fab',
+      '.winkbox-fab-trigger',
+      '[id*="hamburger"]',
+      '[class*="hamburger"]',
+      '[id*="menuToggle"]',
+      '[class*="menu-toggle"]',
+      'button[aria-label*="menu" i]',
+      'button[aria-label*="Menu" i]'
+    ];
 
-  function makeToggle() {
-    var nav = navRoot();
-    if (!nav) return null;
-
-    var old = document.getElementById("mobileMenuToggle");
-    var btn = document.createElement("button");
-
-    btn.id = "mobileMenuToggle";
-    btn.className = "mobile-menu-toggle";
-    btn.type = "button";
-    btn.setAttribute("aria-label", "Buka menu");
-    btn.setAttribute("aria-expanded", document.body.classList.contains("mobile-menu-open") ? "true" : "false");
-    btn.innerHTML = "<span></span><span></span><span></span>";
-
-    if (document.body.classList.contains("mobile-menu-open")) {
-      btn.classList.add("is-open");
-    }
-
-    if (old) old.remove();
-    nav.appendChild(btn);
-
-    return btn;
-  }
-
-  function toggleMenu(e) {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
-    }
-
-    var btn = document.getElementById("mobileMenuToggle");
-    var isOpen = !document.body.classList.contains("mobile-menu-open");
-
-    document.body.classList.toggle("mobile-menu-open", isOpen);
-
-    if (btn) {
-      btn.classList.toggle("is-open", isOpen);
-      btn.setAttribute("aria-expanded", isOpen ? "true" : "false");
-    }
-
-    return false;
-  }
-
-  function bind() {
-    var btn = makeToggle();
-    if (!btn) return;
-
-    btn.onclick = toggleMenu;
-    btn.onpointerdown = toggleMenu;
-    btn.ontouchstart = toggleMenu;
-
-    ["click", "pointerdown", "touchstart"].forEach(function (type) {
-      btn.addEventListener(type, toggleMenu, true);
-      btn.addEventListener(type, toggleMenu, false);
-    });
-
-    document.querySelectorAll("[data-page-target], [data-popup-target]").forEach(function (item) {
-      if (item.dataset.closeMobileBound === "true") return;
-      item.dataset.closeMobileBound = "true";
-      item.addEventListener("click", function () {
-        var btn = document.getElementById("mobileMenuToggle");
-        document.body.classList.remove("mobile-menu-open");
-        if (btn) {
-          btn.classList.remove("is-open");
-          btn.setAttribute("aria-expanded", "false");
-        }
-      }, true);
+    selectors.forEach(function(sel){
+      document.querySelectorAll(sel).forEach(function(el){
+        el.remove();
+      });
     });
   }
 
-  function init() {
-    bind();
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', nukeHamburger);
   } else {
-    init();
+    nukeHamburger();
   }
 
-  window.addEventListener("resize", function () {
-    setTimeout(init, 60);
+  setTimeout(nukeHamburger, 300);
+  setTimeout(nukeHamburger, 1200);
+})();
+</script>
+
+
+<script>
+(function(){
+  function removeHamburgerLeftovers(){
+    var candidates = Array.from(document.querySelectorAll('button, .mobile-menu-toggle, .hamburger, .menu-toggle, .nav-toggle, [id*="mobileMenu"], [class*="hamburger"], [class*="menu-toggle"], .winkbox-fab, .winkbox-fab-trigger'));
+
+    candidates.forEach(function(el){
+      var txt = (el.textContent || '').trim();
+      var label = (el.getAttribute('aria-label') || '').toLowerCase();
+      var html = (el.innerHTML || '').toLowerCase();
+
+      if (
+        el.id === 'mobileMenuToggle' ||
+        el.className.toString().indexOf('mobile-menu-toggle') >= 0 ||
+        el.className.toString().indexOf('hamburger') >= 0 ||
+        el.className.toString().indexOf('menu-toggle') >= 0 ||
+        el.className.toString().indexOf('winkbox-fab') >= 0 ||
+        label.indexOf('menu') >= 0 ||
+        label.indexOf('buka') >= 0 ||
+        (el.tagName === 'BUTTON' && el.querySelectorAll('span').length >= 3) ||
+        (el.tagName === 'BUTTON' && txt === '+')
+      ) {
+        el.remove();
+      }
+    });
+
+    document.body.classList.remove('mobile-menu-open');
+    document.body.classList.remove('fab-open');
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', removeHamburgerLeftovers);
+  } else {
+    removeHamburgerLeftovers();
+  }
+
+  [50, 200, 600, 1200, 2500].forEach(function(t){
+    setTimeout(removeHamburgerLeftovers, t);
   });
 
-  window.addEventListener("hashchange", function () {
-    setTimeout(init, 60);
-  });
+  new MutationObserver(function(){
+    removeHamburgerLeftovers();
+  }).observe(document.documentElement, { childList: true, subtree: true });
 })();
 </script>
 
